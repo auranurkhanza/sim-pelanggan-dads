@@ -20,5 +20,5 @@ Route::get('/', function () {
 
 // Route halaman login
 Route::get('/login', function () {
-    return view('auth.login');
+    return view('login');
 })->name('login');
