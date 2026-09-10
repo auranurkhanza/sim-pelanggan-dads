@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Mengarahkan halaman utama (/) langsung ke halaman login
 Route::get('/', function () {
-    return redirect()->('login');
+    return redirect('/login');
 });
+
+// Route halaman login
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
