@@ -26,36 +26,45 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
+// Menu 1: Validasi Data (Hanya menampilkan antrean data IKR)
 Route::get('/dashboard', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('dashboard', compact('pelanggan'));
 })->middleware('auth');
 
+// Menu 2: Semua Pelanggan
 Route::get('/pelanggan', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('pelanggan', compact('pelanggan'));
 })->middleware('auth');
 
+// Menu 3: Laporan Validasi
 Route::get('/laporan', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('laporan', compact('pelanggan'));
 })->middleware('auth');
 
-// ROUTE SIMPAN DATA (Diperbarui dengan NIK)
+// ROUTE SIMPAN DATA (Bedakan status otomatis antara IKR & Sales)
 Route::post('/pelanggan/store', function (Request $request) {
+    $pengisi = $request->input('pengisi');
+
     $data = [
-        'pengisi'            => $request->input('pengisi'),
+        'pengisi'            => $pengisi,
         'tanggal_aktivasi'   => $request->input('tanggal_aktivasi'),
         'stasiun'            => $request->input('stasiun'),
         'cid'                => $request->input('cid'),
         'sn_ont'             => $request->input('sn_ont'),
         'nama'               => $request->input('nama'),
-        'nik'                => $request->input('nik'), // Tambahan khusus Sales
+        'nik'                => $request->input('nik'),
         'no_hp'              => $request->input('no_hp'),
         'nama_teknisi'       => $request->input('nama_teknisi'),
         'sumber_wo'          => $request->input('sumber_wo'),
         'pic_sales'          => $request->input('pic_sales'),
-        'status_validasi'    => 'pending',
+        
+        // JIKA IKR -> PERLU VALIDASI (PENDING)
+        // JIKA SALES -> LANGSUNG VALID / TIDAK PERLU VALIDASI IKR
+        'status_validasi'    => ($pengisi === 'IKR') ? 'pending' : 'valid',
+        
         'created_at'         => now(),
         'updated_at'         => now(),
     ];
@@ -69,9 +78,15 @@ Route::post('/pelanggan/store', function (Request $request) {
     }
 
     DB::table('pelanggan')->insert($data);
-    return back()->with('success', 'Data pelanggan berhasil dikirim untuk divalidasi!');
+
+    $msg = ($pengisi === 'IKR') 
+        ? 'Data IKR berhasil dikirim untuk divalidasi!' 
+        : 'Data Sales berhasil disimpan!';
+
+    return back()->with('success', $msg);
 })->middleware('auth');
 
+// Route Validasi (Setujui / Tolak oleh Admin)
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
     DB::table('pelanggan')->where('id', $id)->update([
@@ -81,6 +96,7 @@ Route::post('/validasi/{id}', function (Request $request, $id) {
     return back()->with('success', 'Status validasi berhasil diperbarui!');
 })->middleware('auth');
 
+// Route Hapus Pelanggan
 Route::delete('/pelanggan/{id}', function ($id) {
     DB::table('pelanggan')->where('id', $id)->delete();
     return back()->with('success', 'Data pelanggan berhasil dihapus!');
