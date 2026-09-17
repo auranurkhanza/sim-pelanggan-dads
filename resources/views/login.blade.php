@@ -14,8 +14,9 @@
 <body>
     <div class="card">
         <h2>Login SIM Pelanggan</h2>
-        <form method="POST" action="#">
-            <input type="text" placeholder="Username" name="username" required>
+        <form method="POST" action="/login">
+            @csrf
+            <input type="email" placeholder="Email" name="email" required>
             <input type="password" placeholder="Password" name="password" required>
             <button type="submit">Masuk</button>
         </form>
