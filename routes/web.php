@@ -25,13 +25,77 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors(['email' => 'Email atau password salah.']);
 });
 
-Route::get('/dashboard', function () {
-    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+// ROUTE DASHBOARD
+Route::get('/dashboard', function (Request $request) {
+    $query = DB::table('pelanggan');
+
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->where('nama', 'like', "%{$search}%")
+              ->orWhere('cid', 'like', "%{$search}%")
+              ->orWhere('nik', 'like', "%{$search}%");
+        });
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status_validasi', $request->input('status'));
+    }
+
+    if ($request->filled('stasiun')) {
+        $query->where('stasiun', $request->input('stasiun'));
+    }
+
+    $sort = $request->input('sort', 'latest');
+    if ($sort === 'oldest') {
+        $query->orderBy('id', 'asc');
+    } elseif ($sort === 'name_asc') {
+        $query->orderBy('nama', 'asc');
+    } elseif ($sort === 'name_desc') {
+        $query->orderBy('nama', 'desc');
+    } else {
+        $query->orderBy('id', 'desc');
+    }
+
+    $pelanggan = $query->get();
+
     return view('dashboard', compact('pelanggan'));
 })->middleware('auth');
 
-Route::get('/pelanggan', function () {
-    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+// ROUTE SEMUA PELANGGAN (Dengan Filter, Search & Sort)
+Route::get('/pelanggan', function (Request $request) {
+    $query = DB::table('pelanggan');
+
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where(function($q) use ($search) {
+            $q->where('nama', 'like', "%{$search}%")
+              ->orWhere('cid', 'like', "%{$search}%")
+              ->orWhere('nik', 'like', "%{$search}%");
+        });
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status_validasi', $request->input('status'));
+    }
+
+    if ($request->filled('stasiun')) {
+        $query->where('stasiun', $request->input('stasiun'));
+    }
+
+    $sort = $request->input('sort', 'latest');
+    if ($sort === 'oldest') {
+        $query->orderBy('id', 'asc');
+    } elseif ($sort === 'name_asc') {
+        $query->orderBy('nama', 'asc');
+    } elseif ($sort === 'name_desc') {
+        $query->orderBy('nama', 'desc');
+    } else {
+        $query->orderBy('id', 'desc');
+    }
+
+    $pelanggan = $query->get();
+
     return view('pelanggan', compact('pelanggan'));
 })->middleware('auth');
 
@@ -40,7 +104,7 @@ Route::get('/laporan', function () {
     return view('laporan', compact('pelanggan'));
 })->middleware('auth');
 
-// FUNGSI OCR UNTUK MEMBACA TEKS DARI GAMBAR
+// FUNGSI OCR MEMBACA TEKS GAMBAR
 function ocrReadImage($file) {
     try {
         $response = Http::attach(
@@ -61,7 +125,7 @@ function ocrReadImage($file) {
     return '';
 }
 
-// ROUTE SIMPAN DENGAN LOGIKA RETRY & REMARK REVISI
+// ROUTE SIMPAN DATA PELANGGAN
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
     $namaInput = strtoupper(trim($request->input('nama')));
@@ -71,11 +135,10 @@ Route::post('/pelanggan/store', function (Request $request) {
     if ($pengisi === 'IKR') {
         if (!$request->hasFile('foto_ktp') || !$request->hasFile('foto_bast')) {
             return back()->withInput()->withErrors([
-                'error' => 'Gagal submit! Foto KTP dan Foto BAST wajib diunggah untuk verifikasi IKR.'
+                'error' => 'Gagal submit! Foto KTP dan Foto BAST wajib diunggah untuk verifikasi.'
             ]);
         }
 
-        // 1. Scan OCR Foto KTP & BAST
         $teksKtp = ocrReadImage($request->file('foto_ktp'));
         $ktpMatched = str_contains($teksKtp, $namaInput);
 
@@ -90,7 +153,6 @@ Route::post('/pelanggan/store', function (Request $request) {
             if (!$bastMatched) $alasan[] = 'Nama tidak ditemukan pada Foto BAST';
             $teksAlasan = implode(' & ', $alasan);
 
-            // Percobaan Pertama (Retry < 1) -> Minta Input Ulang
             if ($retryCount < 1) {
                 return back()->withInput([
                     'pengisi' => 'IKR',
@@ -109,7 +171,6 @@ Route::post('/pelanggan/store', function (Request $request) {
                 ]);
             }
 
-            // Percobaan Kedua Masih Salah -> Simpan ke PENDING dengan REMARK REVISI
             $statusValidasi = 'pending';
             $remark = 'Gagal Auto-Validasi: ' . $teksAlasan;
             $pesan = 'Data tersimpan ke antrean PENDING (Butuh Revisi) karena validasi foto 2x tidak cocok.';
@@ -169,7 +230,7 @@ Route::post('/validasi/{id}', function (Request $request, $id) {
     return back()->with('success', 'Status validasi berhasil diperbarui!');
 })->middleware('auth');
 
-// ROUTE EXPORT DATA KE CSV / EXCEL
+// ROUTE EXPORT EXCEL
 Route::get('/pelanggan/export', function () {
     $fileName = 'data_pelanggan_' . date('Y-m-d_H-i-s') . '.csv';
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
@@ -190,20 +251,10 @@ Route::get('/pelanggan/export', function () {
 
         foreach ($pelanggan as $item) {
             fputcsv($file, array(
-                $item->id,
-                $item->pengisi,
-                $item->tanggal_aktivasi,
-                $item->stasiun,
-                $item->cid,
-                $item->sn_ont,
-                $item->nama,
-                $item->nik,
-                $item->no_hp,
-                $item->nama_teknisi,
-                $item->sumber_wo,
-                $item->pic_sales,
-                $item->status_validasi,
-                $item->remark
+                $item->id, $item->pengisi, $item->tanggal_aktivasi, $item->stasiun,
+                $item->cid, $item->sn_ont, $item->nama, $item->nik,
+                $item->no_hp, $item->nama_teknisi, $item->sumber_wo, $item->pic_sales,
+                $item->status_validasi, $item->remark
             ));
         }
 
@@ -213,7 +264,7 @@ Route::get('/pelanggan/export', function () {
     return response()->stream($callback, 200, $headers);
 })->middleware('auth');
 
-// ROUTE HAPUS DATA
+// ROUTE HAPUS
 Route::delete('/pelanggan/{id}', function ($id) {
     DB::table('pelanggan')->where('id', $id)->delete();
     return back()->with('success', 'Data pelanggan berhasil dihapus!');
