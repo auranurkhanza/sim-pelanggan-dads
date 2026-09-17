@@ -27,14 +27,27 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::get('/dashboard', function () {
-    // Mengambil data pelanggan dari database (jika belum ada, gunakan array dummy)
-    $pelanggan = DB::table('pelanggan')->get();
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('dashboard', compact('pelanggan'));
+})->middleware('auth');
+
+// Route untuk menyimpan data pelanggan baru (input oleh Sales/Teknisi)
+Route::post('/pelanggan/store', function (Request $request) {
+    DB::table('pelanggan')->insert([
+        'nik' => $request->input('nik'),
+        'nama' => $request->input('nama'),
+        'alamat' => $request->input('alamat'),
+        'status_validasi' => 'pending',
+        'created_at' => now(),
+        'updated_at' => now()
+    ]);
+
+    return back()->with('success', 'Data pelanggan berhasil ditambahkan!');
 })->middleware('auth');
 
 // Route untuk aksi tombol Setujui / Tolak
 Route::post('/validasi/{id}', function (Request $request, $id) {
-    $status = $request->input('status'); // 'valid' atau 'invalid'
+    $status = $request->input('status');
     
     DB::table('pelanggan')->where('id', $id)->update([
         'status_validasi' => $status,
