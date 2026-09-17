@@ -26,7 +26,6 @@
             text-align: center; 
         }
 
-        /* Branding Header Starlite x PT DADS */
         .brand-header {
             margin-bottom: 24px;
         }
@@ -120,6 +119,26 @@
             box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5); 
         }
         
+        .link-register {
+            display: block;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
+        .link-register:hover { text-decoration: underline; }
+
+        .alert-success { 
+            background-color: rgba(16, 185, 129, 0.2); 
+            color: #34d399; 
+            border: 1px solid #10b981; 
+            padding: 10px 12px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            margin-bottom: 18px; 
+            text-align: left; 
+        }
+
         .error-msg { 
             background-color: rgba(239, 68, 68, 0.2); 
             color: #f87171; 
@@ -151,6 +170,12 @@
         <h3>SIVALID SYSTEM</h3>
         <p>Sistem Informasi Validasi Data Pelanggan</p>
 
+        @if(session('success'))
+            <div class="alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="error-msg">
                 {{ $errors->first() }}
@@ -171,6 +196,8 @@
 
             <button type="submit" class="btn-login">Masuk ke Sistem</button>
         </form>
+
+        <a href="/register" class="link-register">Belum punya akun? Daftar di sini</a>
 
         <div class="footer-text">
             &copy; {{ date('Y') }} STARLITE x PT DADS. All Rights Reserved.
