@@ -6,58 +6,71 @@
     <title>Validasi Data - SIVALID STARLITE DADS</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #f4f6f9; color: #333; }
+        body { display: flex; height: 100vh; background-color: #0f172a; color: #f8fafc; }
         
-        .sidebar { width: 250px; background-color: #1e293b; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 16px; font-weight: bold; margin-bottom: 25px; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 12px; letter-spacing: 0.5px; }
-        .menu a { display: block; color: #cbd5e1; text-decoration: none; padding: 10px 14px; border-radius: 6px; margin-bottom: 6px; font-size: 14px; }
-        .menu a:hover, .menu a.active { background-color: #0284c7; color: white; }
-        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; }
+        /* Sidebar Bertema Starlite (Dark Navy & Neon Cyan) */
+        .sidebar { width: 260px; background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%); color: white; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; }
+        .sidebar h2 { font-size: 16px; font-weight: 800; margin-bottom: 25px; color: #38bdf8; border-bottom: 2px solid #0284c7; padding-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+        .menu a { display: block; color: #94a3b8; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s; }
+        .menu a:hover, .menu a.active { background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%); color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); }
+        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; font-weight: 600; transition: background 0.2s; }
+        .logout-btn:hover { background-color: #dc2626; }
         
-        .main-content { flex: 1; padding: 25px; overflow-y: auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h1 { font-size: 22px; color: #0f172a; }
-        .btn-add { background-color: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; }
-        .btn-export { background-color: #16a34a; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; margin-right: 8px; display: inline-block; }
+        /* Main Content */
+        .main-content { flex: 1; padding: 28px; overflow-y: auto; background-color: #0f172a; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; letter-spacing: -0.5px; }
+        .btn-add { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3); transition: transform 0.2s; }
+        .btn-add:hover { transform: translateY(-2px); }
+        .btn-export { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; margin-right: 10px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s; }
+        .btn-export:hover { transform: translateY(-2px); }
         
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .card h3 { font-size: 13px; color: #64748b; margin-bottom: 8px; }
-        .card .number { font-size: 22px; font-weight: bold; color: #0f172a; }
+        /* Stats Cards */
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
+        .card { background-color: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
+        .card h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card .number { font-size: 26px; font-weight: 800; color: #f8fafc; }
         
-        .table-container { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        /* Table Style */
+        .table-container { background-color: #1e293b; padding: 22px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+        .table-header h3 { font-size: 16px; color: #38bdf8; font-weight: 700; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background-color: #0f172a; color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        td { color: #e2e8f0; }
         
-        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .badge.valid { background-color: #dcfce7; color: #166534; }
-        .badge.pending { background-color: #fef9c3; color: #854d0e; }
-        .badge.invalid { background-color: #fee2e2; color: #991b1b; }
-        .badge.sales { background-color: #e0f2fe; color: #0369a1; }
+        /* Badges */
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .badge.valid { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge.pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge.invalid { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge.sales { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
         
-        .btn-action { padding: 6px 10px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; color: white; text-decoration: none; margin-right: 2px; }
-        .btn-valid { background-color: #16a34a; }
-        .btn-invalid { background-color: #dc2626; }
+        /* Buttons Action */
+        .btn-action { padding: 7px 12px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: white; text-decoration: none; margin-right: 4px; }
+        .btn-valid { background-color: #10b981; }
+        .btn-invalid { background-color: #ef4444; }
         .btn-delete { background-color: #64748b; }
         
-        .alert-success { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
-        .alert-danger { padding: 12px; background-color: #fee2e2; color: #991b1b; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .alert-success { padding: 14px; background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; border-radius: 8px; margin-bottom: 22px; font-size: 14px; }
+        .alert-danger { padding: 14px; background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; margin-bottom: 22px; font-size: 14px; }
         
         /* Modal Form */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 650px; max-height: 90vh; overflow-y: auto; }
-        .modal-content h3 { margin-bottom: 15px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
+        .modal-content { background-color: #1e293b; padding: 28px; border-radius: 12px; border: 1px solid #334155; width: 680px; max-height: 90vh; overflow-y: auto; color: #f8fafc; }
+        .modal-content h3 { margin-bottom: 18px; color: #38bdf8; font-size: 18px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #475569; }
-        .form-group input, .form-group select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #cbd5e1; }
+        .form-group input, .form-group select { padding: 10px 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; }
+        .form-group input:focus, .form-group select:focus { border-color: #38bdf8; outline: none; }
         .full-width { grid-column: span 2; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
-        .btn-cancel { background-color: #94a3b8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; }
+        .btn-cancel { background-color: #475569; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
         
-        .form-section { display: none; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #cbd5e1; grid-column: span 2; }
+        .form-section { display: none; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #334155; grid-column: span 2; }
     </style>
 </head>
 <body>
@@ -98,21 +111,21 @@
             </div>
             <div class="card">
                 <h3>Pending</h3>
-                <div class="number" style="color: #d97706;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'pending')->count() }}</div>
+                <div class="number" style="color: #fbbf24;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'pending')->count() }}</div>
             </div>
             <div class="card">
                 <h3>Valid</h3>
-                <div class="number" style="color: #16a34a;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'valid')->count() }}</div>
+                <div class="number" style="color: #34d399;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'valid')->count() }}</div>
             </div>
             <div class="card">
                 <h3>Tidak Valid</h3>
-                <div class="number" style="color: #dc2626;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'invalid')->count() }}</div>
+                <div class="number" style="color: #f87171;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'invalid')->count() }}</div>
             </div>
         </div>
 
         <div class="table-container">
             <div class="table-header">
-                <h3>Daftar Antrean Validasi IKR</h3>
+                <h3>Daftar Antrean Validasi IKR (Starlite FTTH)</h3>
             </div>
             
             <table>
@@ -130,11 +143,11 @@
                     <tr>
                         <td>
                             <strong>{{ $item->cid ?? $item->nik ?? 'N/A' }}</strong><br>
-                            <small>{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
+                            <small style="color: #94a3b8;">{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
                         </td>
                         <td>
-                            <span class="badge" style="background:#e2e8f0; color:#334155;">{{ strtoupper($item->pengisi ?? '-') }}</span><br>
-                            <small>{{ $item->stasiun ?? '-' }}</small>
+                            <span class="badge" style="background-color: #334155; color: #f8fafc;">{{ strtoupper($item->pengisi ?? '-') }}</span><br>
+                            <small style="color: #94a3b8;">{{ $item->stasiun ?? '-' }}</small>
                         </td>
                         <td>
                             @if($item->pengisi == 'IKR')
@@ -150,7 +163,7 @@
                             @endif
                         </td>
                         <td>
-                            <small style="color: #64748b; font-style: italic;">
+                            <small style="color: #94a3b8; font-style: italic;">
                                 {{ $item->remark ?? '-' }}
                             </small>
                         </td>
@@ -184,7 +197,7 @@
     <!-- Modal Form Input Dinamis -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
-            <h3>Input Data Pelanggan Baru</h3>
+            <h3>Input Data Pelanggan Starlite Baru</h3>
             
             <form action="/pelanggan/store" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -203,10 +216,10 @@
 
                     <!-- FORM KHUSUS IKR (14 Data) -->
                     <div id="formIKR" class="form-section">
-                        <h4 style="color:#0284c7; margin-bottom:15px; grid-column: span 2;">
+                        <h4 style="color:#38bdf8; margin-bottom:15px; grid-column: span 2;">
                             Form Input Khusus IKR (Teknisi)
                             @if(old('retry_count', 0) >= 1)
-                                <span style="color:#dc2626; font-size:12px; font-weight:bold;">[Percobaan Ke-2: Jika foto tetap tidak cocok, data akan masuk PENDING]</span>
+                                <span style="color:#f87171; font-size:12px; font-weight:bold;">[Percobaan Ke-2: Jika foto tetap tidak cocok, data akan masuk PENDING]</span>
                             @endif
                         </h4>
                         
@@ -303,7 +316,7 @@
 
                     <!-- FORM KHUSUS SALES (9 Data) -->
                     <div id="formSales" class="form-section">
-                        <h4 style="color:#d97706; margin-bottom:15px; grid-column: span 2;">Form Input Khusus Sales</h4>
+                        <h4 style="color:#fbbf24; margin-bottom:15px; grid-column: span 2;">Form Input Khusus Sales</h4>
                         
                         <div class="form-group">
                             <label>2. Tanggal Aktivasi</label>
