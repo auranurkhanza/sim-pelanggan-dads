@@ -40,13 +40,13 @@ Route::get('/laporan', function () {
     return view('laporan', compact('pelanggan'));
 })->middleware('auth');
 
-// FUNGSI BANTUAN OCR UNTUK MEMBACA TEKS DARI FOTO
+// FUNGSI OCR UNTUK MEMBACA TEKS DARI GAMBAR
 function ocrReadImage($file) {
     try {
         $response = Http::attach(
             'file', file_get_contents($file->path()), $file->getClientOriginalName()
         )->post('https://api.ocr.space/parse/image', [
-            'apikey' => 'K86792934788957', // API Key OCR.space
+            'apikey' => 'K86792934788957',
             'language' => 'eng',
             'isOverlayRequired' => 'false'
         ]);
@@ -61,50 +61,43 @@ function ocrReadImage($file) {
     return '';
 }
 
-// ROUTE SIMPAN DENGAN AUTO-VALIDASI OCR (KTP & BAST)
+// ROUTE SIMPAN KETAT (JIKA TIDAK VALID -> BLOKIR SUBMIT)
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
     $namaInput = strtoupper(trim($request->input('nama')));
-    
-    $statusValidasi = 'pending';
-    $catatanValidasi = '';
 
-    // Lakukan OCR hanya jika tipe pengisi = IKR
+    // VALIDASI KHUSUS IKR
     if ($pengisi === 'IKR') {
-        $ktpMatched = false;
-        $bastMatched = false;
+        // Pastikan berkas foto KTP & BAST diunggah
+        if (!$request->hasFile('foto_ktp') || !$request->hasFile('foto_bast')) {
+            return back()->withInput()->withErrors([
+                'error' => 'Gagal submit! Foto KTP dan Foto BAST wajib diunggah untuk verifikasi IKR.'
+            ]);
+        }
 
         // 1. Scan Foto KTP
-        if ($request->hasFile('foto_ktp')) {
-            $teksKtp = ocrReadImage($request->file('foto_ktp'));
-            if (str_contains($teksKtp, $namaInput)) {
-                $ktpMatched = true;
-            }
-        }
+        $teksKtp = ocrReadImage($request->file('foto_ktp'));
+        $ktpMatched = str_contains($teksKtp, $namaInput);
 
         // 2. Scan Foto BAST
-        if ($request->hasFile('foto_bast')) {
-            $teksBast = ocrReadImage($request->file('foto_bast'));
-            if (str_contains($teksBast, $namaInput)) {
-                $bastMatched = true;
-            }
+        $teksBast = ocrReadImage($request->file('foto_bast'));
+        $bastMatched = str_contains($teksBast, $namaInput);
+
+        // JIKA NAMA TIDAK COCOK DI KTP ATAU BAST -> TOLAK / BLOKIR SUBMIT
+        if (!$ktpMatched || !$bastMatched) {
+            $alasan = [];
+            if (!$ktpMatched) $alasan[] = 'Nama tidak ditemukan pada Foto KTP';
+            if (!$bastMatched) $alasan[] = 'Nama tidak ditemukan pada Foto BAST';
+
+            return back()->withInput()->withErrors([
+                'error' => 'Gagal Submit! Data Tidak Valid: ' . implode(' & ', $alasan) . '. Pastikan nama pelanggan sesuai dengan foto yang diunggah!'
+            ]);
         }
 
-        // 3. Evaluasi Hasil Pencocokan Nama
-        if ($ktpMatched && $bastMatched) {
-            $statusValidasi = 'valid'; // Keduanya Cocok Otomatis Valid!
-            $catatanValidasi = 'Sistem Auto-Validasi: Nama sesuai pada KTP dan BAST.';
-        } elseif ($ktpMatched || $bastMatched) {
-            $statusValidasi = 'pending';
-            $catatanValidasi = 'Sistem Auto-Validasi: Nama hanya ditemukan di salah satu berkas.';
-        } else {
-            $statusValidasi = 'invalid';
-            $catatanValidasi = 'Sistem Auto-Validasi: Nama tidak ditemukan pada Foto KTP & BAST.';
-        }
+        $statusValidasi = 'valid';
     } else {
         // Sales otomatis Valid
         $statusValidasi = 'valid';
-        $catatanValidasi = 'Input Sales Direct';
     }
 
     $data = [
@@ -134,7 +127,7 @@ Route::post('/pelanggan/store', function (Request $request) {
 
     DB::table('pelanggan')->insert($data);
 
-    return back()->with('success', 'Data Pelanggan Berhasil Diproses! ' . $catatanValidasi);
+    return back()->with('success', 'Data Pelanggan Valid dan Berhasil Disimpan!');
 })->middleware('auth');
 
 Route::post('/validasi/{id}', function (Request $request, $id) {
