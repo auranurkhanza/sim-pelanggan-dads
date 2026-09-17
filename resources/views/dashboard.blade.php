@@ -34,6 +34,7 @@
         .badge.valid { background-color: #dcfce7; color: #166534; }
         .badge.pending { background-color: #fef9c3; color: #854d0e; }
         .badge.invalid { background-color: #fee2e2; color: #991b1b; }
+        .badge.sales { background-color: #e0f2fe; color: #0369a1; }
         
         .btn-action { padding: 6px 10px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; color: white; text-decoration: none; margin-right: 2px; }
         .btn-valid { background-color: #16a34a; }
@@ -62,7 +63,7 @@
         <div>
             <h2>SIM PELANGGAN DADS</h2>
             <div class="menu">
-                <a href="/dashboard" class="active">Validasi Data</a>
+                <a href="/dashboard" class="active">Validasi Data (IKR)</a>
                 <a href="/pelanggan">Semua Pelanggan</a>
                 <a href="/laporan">Laporan Validasi</a>
             </div>
@@ -72,7 +73,7 @@
 
     <div class="main-content">
         <div class="header">
-            <h1>Validasi Data Pelanggan</h1>
+            <h1>Validasi Data Pelanggan IKR</h1>
             <button class="btn-add" onclick="openModal()">+ Input Pelanggan Baru</button>
         </div>
 
@@ -82,34 +83,34 @@
 
         <div class="cards">
             <div class="card">
-                <h3>Total Pengajuan</h3>
-                <div class="number">{{ count($pelanggan) }}</div>
+                <h3>Total Pengajuan IKR</h3>
+                <div class="number">{{ $pelanggan->where('pengisi', 'IKR')->count() }}</div>
             </div>
             <div class="card">
                 <h3>Belum Divalidasi</h3>
-                <div class="number" style="color: #d97706;">{{ $pelanggan->where('status_validasi', 'pending')->count() }}</div>
+                <div class="number" style="color: #d97706;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'pending')->count() }}</div>
             </div>
             <div class="card">
-                <h3>Data Valid</h3>
-                <div class="number" style="color: #16a34a;">{{ $pelanggan->where('status_validasi', 'valid')->count() }}</div>
+                <h3>IKR Valid</h3>
+                <div class="number" style="color: #16a34a;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'valid')->count() }}</div>
             </div>
             <div class="card">
-                <h3>Data Tidak Valid</h3>
-                <div class="number" style="color: #dc2626;">{{ $pelanggan->where('status_validasi', 'invalid')->count() }}</div>
+                <h3>IKR Tidak Valid</h3>
+                <div class="number" style="color: #dc2626;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'invalid')->count() }}</div>
             </div>
         </div>
 
         <div class="table-container">
             <div class="table-header">
-                <h3>Daftar Antrean Validasi</h3>
+                <h3>Daftar Antrean Validasi IKR</h3>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th>CID / NIK / Nama</th>
+                        <th>CID / Nama</th>
                         <th>Pengisi & Stasiun</th>
-                        <th>Teknisi & Sales</th>
+                        <th>Teknisi / Sales</th>
                         <th>Status Validasi</th>
                         <th>Aksi</th>
                     </tr>
@@ -118,7 +119,6 @@
                     @foreach($pelanggan as $item)
                     <tr>
                         <td>
-                            <!-- Menampilkan CID atau NIK tergantung yang mana yang terisi -->
                             <strong>{{ $item->cid ?? $item->nik ?? 'N/A' }}</strong><br>
                             <small>{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
                         </td>
@@ -127,20 +127,28 @@
                             <small>{{ $item->stasiun ?? '-' }}</small>
                         </td>
                         <td>
-                            Teknisi: {{ $item->nama_teknisi ?? '-' }}<br>
-                            <small>Sales: {{ $item->pic_sales ?? '-' }}</small>
-                        </td>
-                        <td>
-                            @if($item->status_validasi == 'pending')
-                                <span class="badge pending">Pending</span>
-                            @elseif($item->status_validasi == 'valid')
-                                <span class="badge valid">Valid</span>
+                            @if($item->pengisi == 'IKR')
+                                Teknisi: {{ $item->nama_teknisi ?? '-' }}
                             @else
-                                <span class="badge invalid">Tidak Valid</span>
+                                Sales: {{ $item->pic_sales ?? '-' }}
                             @endif
                         </td>
                         <td>
-                            @if($item->status_validasi == 'pending')
+                            @if($item->pengisi == 'IKR')
+                                @if($item->status_validasi == 'pending')
+                                    <span class="badge pending">Pending</span>
+                                @elseif($item->status_validasi == 'valid')
+                                    <span class="badge valid">Valid</span>
+                                @else
+                                    <span class="badge invalid">Tidak Valid</span>
+                                @endif
+                            @else
+                                <span class="badge sales">Direct Sales</span>
+                            @endif
+                        </td>
+                        <td>
+                            <!-- HANYA TAMPILKAN TOMBOL VALIDASI JIKA DARI IKR & STATUSNYA PENDING -->
+                            @if($item->pengisi == 'IKR' && $item->status_validasi == 'pending')
                                 <form action="/validasi/{{ $item->id }}" method="POST" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="status" value="valid">
@@ -153,7 +161,7 @@
                                 </form>
                             @endif
 
-                            <form action="/pelanggan/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pelanggan ini?');">
+                            <form action="/pelanggan/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-action btn-delete">Hapus</button>
@@ -175,19 +183,16 @@
                 @csrf
                 <div class="form-grid">
                     
-                    <!-- Pilihan Pengisi -->
                     <div class="form-group full-width">
                         <label>1. Pilih Tipe Pengisi Data</label>
                         <select name="pengisi" id="pengisiSelect" onchange="toggleFormByPengisi()" required>
                             <option value="">-- Pilih Tipe Pengisi --</option>
-                            <option value="IKR">IKR (Teknisi)</option>
-                            <option value="Sales">Sales</option>
+                            <option value="IKR">IKR (Teknisi - Perlu Validasi)</option>
+                            <option value="Sales">Sales (Langsung Tersimpan)</option>
                         </select>
                     </div>
 
-                    <!-- ============================================== -->
-                    <!-- BAGIAN FORM KHUSUS IKR (14 Data) -->
-                    <!-- ============================================== -->
+                    <!-- FORM KHUSUS IKR (14 Data) -->
                     <div id="formIKR" class="form-section">
                         <h4 style="color:#0284c7; margin-bottom:15px; grid-column: span 2;">Form Input Khusus IKR (Teknisi)</h4>
                         
@@ -248,9 +253,7 @@
                         </div>
                     </div>
 
-                    <!-- ============================================== -->
-                    <!-- BAGIAN FORM KHUSUS SALES (9 Data) -->
-                    <!-- ============================================== -->
+                    <!-- FORM KHUSUS SALES (9 Data) -->
                     <div id="formSales" class="form-section">
                         <h4 style="color:#d97706; margin-bottom:15px; grid-column: span 2;">Form Input Khusus Sales</h4>
                         
@@ -295,7 +298,6 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-                    <!-- Tombol simpan default dinonaktifkan sampai tipe pengisi dipilih -->
                     <button type="submit" class="btn-add" id="btnSubmit" style="display:none;">Simpan Data</button>
                 </div>
             </form>
@@ -305,7 +307,7 @@
     <script>
         function openModal() { 
             document.getElementById('inputModal').style.display = 'flex'; 
-            toggleFormByPengisi(); // reset saat dibuka
+            toggleFormByPengisi();
         }
         function closeModal() { 
             document.getElementById('inputModal').style.display = 'none'; 
@@ -317,28 +319,23 @@
             var formSales = document.getElementById('formSales');
             var btnSubmit = document.getElementById('btnSubmit');
             
-            // Ambil semua input spesifik
             var inputsIKR = formIKR.querySelectorAll('.ikr-input');
             var inputsSales = formSales.querySelectorAll('.sales-input');
 
-            // Matikan dan Sembunyikan semuanya terlebih dahulu
             formIKR.style.display = 'none';
             formSales.style.display = 'none';
             btnSubmit.style.display = 'none';
             inputsIKR.forEach(el => el.disabled = true);
             inputsSales.forEach(el => el.disabled = true);
 
-            // Aktifkan Form berdasarkan pilihan
             if (selected === 'IKR') {
                 formIKR.style.display = 'grid';
                 btnSubmit.style.display = 'block';
-                // Enable inputs IKR dan set wajib diisi (required)
                 inputsIKR.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
             } 
             else if (selected === 'Sales') {
                 formSales.style.display = 'grid';
                 btnSubmit.style.display = 'block';
-                // Enable inputs Sales dan set wajib diisi (required)
                 inputsSales.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
             }
         }
