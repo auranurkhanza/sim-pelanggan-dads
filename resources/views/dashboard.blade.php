@@ -17,7 +17,8 @@
         .main-content { flex: 1; padding: 25px; overflow-y: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 22px; color: #0f172a; }
-        .btn-add { background-color: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn-add { background-color: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; }
+        .btn-export { background-color: #16a34a; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; margin-right: 8px; display: inline-block; }
         
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .card { background: white; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0; }
@@ -76,7 +77,10 @@
     <div class="main-content">
         <div class="header">
             <h1>Validasi Data Pelanggan IKR</h1>
-            <button class="btn-add" onclick="openModal()">+ Input Pelanggan Baru</button>
+            <div>
+                <a href="/pelanggan/export" class="btn-export">📊 Export Excel (CSV)</a>
+                <button class="btn-add" onclick="openModal()">+ Input Pelanggan Baru</button>
+            </div>
         </div>
 
         @if(session('success'))
