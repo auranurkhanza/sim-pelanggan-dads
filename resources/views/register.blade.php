@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - SIVALID STARLITE DADS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: radial-gradient(circle at center, #1c2541 0%, #0f172a 100%); 
+            color: #f8fafc; 
+        }
+        
+        .register-card { 
+            background-color: #1e293b; 
+            padding: 40px 32px; 
+            border-radius: 16px; 
+            border: 1px solid #334155; 
+            width: 400px; 
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1); 
+            text-align: center; 
+        }
+
+        .brand-logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .brand-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #0284c7 50%, transparent 100%);
+            margin: 16px 0 20px 0;
+            border: none;
+        }
+
+        .register-card h3 { font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+        .register-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+        
+        .form-group { text-align: left; margin-bottom: 16px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #cbd5e1; display: block; margin-bottom: 6px; }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px 14px; 
+            background-color: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 8px; 
+            color: #f8fafc; 
+            font-size: 14px; 
+            outline: none; 
+        }
+        .form-group input:focus { border-color: #38bdf8; box-shadow: 0 0 8px rgba(56, 189, 248, 0.3); }
+        
+        .btn-register { 
+            width: 100%; 
+            padding: 12px; 
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); 
+            border: none; 
+            border-radius: 8px; 
+            color: white; 
+            font-weight: 700; 
+            font-size: 14px; 
+            cursor: pointer; 
+            margin-top: 8px; 
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4); 
+        }
+
+        .link-login {
+            display: block;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #38bdf8;
+            text-decoration: none;
+        }
+        .link-login:hover { text-decoration: underline; }
+
+        .error-msg { 
+            background-color: rgba(239, 68, 68, 0.2); 
+            color: #f87171; 
+            border: 1px solid #ef4444; 
+            padding: 10px 12px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            margin-bottom: 18px; 
+            text-align: left; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <div class="brand-logo-text">STARLITE</div>
+        <div class="brand-sub">PT DUTA ANUGRAH DAMAI SEJAHTERA (DADS)</div>
+
+        <hr class="brand-divider">
+
+        <h3>Daftar Akun Baru</h3>
+        <p>Buat akun petugas untuk mengakses sistem</p>
+
+        @if($errors->any())
+            <div class="error-msg">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form action="/register" method="POST">
+            @csrf
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" name="name" placeholder="Masukkan nama lengkap..." required value="{{ old('name') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="Masukkan email..." required value="{{ old('email') }}">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Minimal 6 karakter..." required>
+            </div>
+
+            <button type="submit" class="btn-register">Daftar Akun</button>
+        </form>
+
+        <a href="/login" class="link-login">Sudah punya akun? Login di sini</a>
+    </div>
+
+</body>
+</html>
