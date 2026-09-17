@@ -62,8 +62,8 @@
             <h2>SIM PELANGGAN DADS</h2>
             <div class="menu">
                 <a href="/dashboard" class="active">Validasi Data</a>
-                <a href="#">Semua Pelanggan</a>
-                <a href="#">Laporan Validasi</a>
+                <a href="/pelanggan">Semua Pelanggan</a>
+                <a href="/laporan">Laporan Validasi</a>
             </div>
         </div>
         <a href="/login" class="logout-btn">Keluar / Logout</a>
