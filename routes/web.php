@@ -38,8 +38,8 @@ Route::post('/register', function (Request $request) {
         'email'    => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:6',
     ], [
-        'email.unique'   => 'Email ini sudah terdaftar, silakan gunakan email lain atau login.',
-        'password.min'   => 'Password minimal harus 6 karakter.'
+        'email.unique' => 'Email ini sudah terdaftar, silakan gunakan email lain atau login.',
+        'password.min' => 'Password minimal harus 6 karakter.'
     ]);
 
     DB::table('users')->insert([
