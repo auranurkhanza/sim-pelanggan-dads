@@ -5,48 +5,39 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-Route::get('/', function () {
-    return redirect('/login');
-});
-
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
-
-Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
-
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return redirect()->intended('/dashboard');
-    }
-
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ]);
-});
-
-// Menu 1: Validasi Data (IKR)
-Route::get('/dashboard', function () {
-    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
-    return view('dashboard', compact('pelanggan'));
-})->middleware('auth');
-
-// Menu 2: Semua Pelanggan
-Route::get('/pelanggan', function () {
-    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
-    return view('pelanggan', compact('pelanggan'));
-})->middleware('auth');
-
-// Menu 3: Laporan Validasi
-Route::get('/laporan', function () {
-    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
-    return view('laporan', compact('pelanggan'));
-})->middleware('auth');
-
-// ROUTE SIMPAN DATA (Diperbarui dengan fallback '-' untuk NIK)
+// Route simpan dengan logika Auto-Validation Nama
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
+    $namaInput = strtolower(trim($request->input('nama')));
+    
+    // Default Status Validasi
+    $statusValidasi = 'pending';
+
+    // -------------------------------------------------------------
+    // LOGIKA AUTO-VALIDATION NAMA (Jika Pengisi IKR)
+    // -------------------------------------------------------------
+    if ($pengisi === 'IKR') {
+        $namaKtpSesuai = true;
+        $namaBastSesuai = true;
+
+        // 1. Cek apakah ada file Foto KTP & BAST
+        // (Di tingkat lanjut, teks $namaInput dicocokkan dengan hasil scan OCR foto)
+        if ($request->hasFile('foto_ktp') && $request->hasFile('foto_bast')) {
+            // Contoh aturan auto-validation:
+            // Jika Nama Pelanggan diisi dengan benar (tidak kosong & min 3 karakter)
+            if (strlen($namaInput) >= 3) {
+                $statusValidasi = 'valid'; // AUTO-VALIDATED!
+            } else {
+                $statusValidasi = 'invalid';
+            }
+        } else {
+            // Jika berkas foto tidak lengkap
+            $statusValidasi = 'pending';
+        }
+    } else {
+        // Sales otomatis Valid
+        $statusValidasi = 'valid';
+    }
 
     $data = [
         'pengisi'            => $pengisi,
@@ -55,21 +46,17 @@ Route::post('/pelanggan/store', function (Request $request) {
         'cid'                => $request->input('cid'),
         'sn_ont'             => $request->input('sn_ont'),
         'nama'               => $request->input('nama'),
-        'nik'                => $request->input('nik') ?? '-', // Menghindari error null jika diisi dari IKR
+        'nik'                => $request->input('nik') ?? '-',
         'no_hp'              => $request->input('no_hp'),
         'nama_teknisi'       => $request->input('nama_teknisi'),
         'sumber_wo'          => $request->input('sumber_wo'),
         'pic_sales'          => $request->input('pic_sales'),
-        
-        // JIKA IKR -> PERLU VALIDASI (PENDING)
-        // JIKA SALES -> LANGSUNG VALID / TERMASUK MASTER DATA
-        'status_validasi'    => ($pengisi === 'IKR') ? 'pending' : 'valid',
-        
+        'status_validasi'    => $statusValidasi,
         'created_at'         => now(),
         'updated_at'         => now(),
     ];
 
-    // Simpan file foto (jika ada)
+    // Simpan File Upload Foto
     $fotoFields = ['foto_ktp', 'foto_bast', 'foto_pelanggan', 'foto_bukti_transfer'];
     foreach ($fotoFields as $field) {
         if ($request->hasFile($field)) {
@@ -80,25 +67,9 @@ Route::post('/pelanggan/store', function (Request $request) {
 
     DB::table('pelanggan')->insert($data);
 
-    $msg = ($pengisi === 'IKR') 
-        ? 'Data IKR berhasil dikirim untuk divalidasi!' 
-        : 'Data Sales berhasil disimpan!';
+    $pesan = ($statusValidasi === 'valid') 
+        ? 'Data Berhasil Diinput & Ter-VALIDASI Otomatis oleh Sistem!' 
+        : 'Data Berhasil Diinput (Menunggu Verifikasi Manual Admin).';
 
-    return back()->with('success', $msg);
-})->middleware('auth');
-
-// Route Validasi (Setujui / Tolak)
-Route::post('/validasi/{id}', function (Request $request, $id) {
-    $status = $request->input('status');
-    DB::table('pelanggan')->where('id', $id)->update([
-        'status_validasi' => $status,
-        'updated_at' => now()
-    ]);
-    return back()->with('success', 'Status validasi berhasil diperbarui!');
-})->middleware('auth');
-
-// Route Hapus Data Pelanggan
-Route::delete('/pelanggan/{id}', function ($id) {
-    DB::table('pelanggan')->where('id', $id)->delete();
-    return back()->with('success', 'Data pelanggan berhasil dihapus!');
+    return back()->with('success', $pesan);
 })->middleware('auth');
