@@ -23,10 +23,18 @@
         .btn-export { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; margin-right: 10px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s; }
         .btn-export:hover { transform: translateY(-2px); }
         
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 20px; }
         .card { background-color: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
         .card h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .card .number { font-size: 26px; font-weight: 800; color: #f8fafc; }
+
+        /* BARIS KONTROL FILTER, SEARCH & SORT */
+        .filter-bar { background-color: #1e293b; padding: 16px 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .filter-input, .filter-select { padding: 9px 14px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
+        .filter-input:focus, .filter-select:focus { border-color: #38bdf8; box-shadow: 0 0 6px rgba(56, 189, 248, 0.3); }
+        .btn-filter { padding: 9px 16px; background-color: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        .btn-reset { padding: 9px 16px; background-color: #475569; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; }
         
         .table-container { background-color: #1e293b; padding: 22px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
@@ -116,6 +124,41 @@
             </div>
         </div>
 
+        <!-- FORM FILTER & SORT TERUS DITAMPILKAN DI ATAS TABEL -->
+        <form action="/dashboard" method="GET" class="filter-bar">
+            <div class="filter-group">
+                <input type="text" name="search" class="filter-input" placeholder="Cari Nama / CID / NIK..." value="{{ request('search') }}">
+                
+                <select name="status" class="filter-select">
+                    <option value="">-- Semua Status --</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="valid" {{ request('status') == 'valid' ? 'selected' : '' }}>Valid</option>
+                    <option value="invalid" {{ request('status') == 'invalid' ? 'selected' : '' }}>Tidak Valid</option>
+                </select>
+
+                <select name="stasiun" class="filter-select">
+                    <option value="">-- Semua Stasiun --</option>
+                    <option value="Tasikmalaya" {{ request('stasiun') == 'Tasikmalaya' ? 'selected' : '' }}>Tasikmalaya</option>
+                    <option value="Randuagung" {{ request('stasiun') == 'Randuagung' ? 'selected' : '' }}>Randuagung</option>
+                    <option value="Garum" {{ request('stasiun') == 'Garum' ? 'selected' : '' }}>Garum</option>
+                    <option value="Malang" {{ request('stasiun') == 'Malang' ? 'selected' : '' }}>Malang</option>
+                    <option value="Semarang Poncol" {{ request('stasiun') == 'Semarang Poncol' ? 'selected' : '' }}>Semarang Poncol</option>
+                </select>
+
+                <select name="sort" class="filter-select">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Urutkan: Terbaru</option>
+                    <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Urutkan: Terlama</option>
+                    <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama: A - Z</option>
+                    <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Nama: Z - A</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="btn-filter">Terapkan Filter</button>
+                <a href="/dashboard" class="btn-reset">Reset</a>
+            </div>
+        </form>
+
         <div class="table-container">
             <div class="table-header">
                 <h3>Daftar Antrean Validasi (Starlite FTTH)</h3>
@@ -132,7 +175,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($pelanggan as $item)
+                    @forelse($pelanggan as $item)
                     <tr>
                         <td>
                             <strong>{{ $item->cid ?? $item->nik ?? 'N/A' }}</strong><br>
@@ -181,7 +224,13 @@
                             </form>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">
+                            Belum ada data pelanggan dalam antrean validasi.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -388,7 +437,6 @@
                 inputsIKR.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
             } 
             else if (selected === 'Sales') {
-                formSales.style.display = 'none';
                 formSales.style.display = 'grid';
                 btnSubmit.style.display = 'block';
                 inputsSales.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
