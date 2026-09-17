@@ -75,7 +75,7 @@ Route::post('/pelanggan/store', function (Request $request) {
     return back()->with('success', 'Data pelanggan berhasil dikirim untuk divalidasi!');
 })->middleware('auth');
 
-// Route Aksi Validasi
+// Route Aksi Validasi (Setujui / Tolak)
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
     
@@ -85,4 +85,10 @@ Route::post('/validasi/{id}', function (Request $request, $id) {
     ]);
 
     return back()->with('success', 'Status validasi berhasil diperbarui!');
+})->middleware('auth');
+
+// ROUTE BARU: Hapus Data Pelanggan
+Route::delete('/pelanggan/{id}', function ($id) {
+    DB::table('pelanggan')->where('id', $id)->delete();
+    return back()->with('success', 'Data pelanggan berhasil dihapus!');
 })->middleware('auth');
