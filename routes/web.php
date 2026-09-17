@@ -61,43 +61,61 @@ function ocrReadImage($file) {
     return '';
 }
 
-// ROUTE SIMPAN KETAT (JIKA TIDAK VALID -> BLOKIR SUBMIT)
+// ROUTE SIMPAN DENGAN LOGIKA RETRY (MAKSIMAL 2 KALI)
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
     $namaInput = strtoupper(trim($request->input('nama')));
+    $retryCount = (int) $request->input('retry_count', 0);
 
-    // VALIDASI KHUSUS IKR
     if ($pengisi === 'IKR') {
-        // Pastikan berkas foto KTP & BAST diunggah
         if (!$request->hasFile('foto_ktp') || !$request->hasFile('foto_bast')) {
             return back()->withInput()->withErrors([
                 'error' => 'Gagal submit! Foto KTP dan Foto BAST wajib diunggah untuk verifikasi IKR.'
             ]);
         }
 
-        // 1. Scan Foto KTP
+        // 1. Scan OCR Foto KTP & BAST
         $teksKtp = ocrReadImage($request->file('foto_ktp'));
         $ktpMatched = str_contains($teksKtp, $namaInput);
 
-        // 2. Scan Foto BAST
         $teksBast = ocrReadImage($request->file('foto_bast'));
         $bastMatched = str_contains($teksBast, $namaInput);
 
-        // JIKA NAMA TIDAK COCOK DI KTP ATAU BAST -> TOLAK / BLOKIR SUBMIT
-        if (!$ktpMatched || !$bastMatched) {
-            $alasan = [];
-            if (!$ktpMatched) $alasan[] = 'Nama tidak ditemukan pada Foto KTP';
-            if (!$bastMatched) $alasan[] = 'Nama tidak ditemukan pada Foto BAST';
+        $isValid = ($ktpMatched && $bastMatched);
 
-            return back()->withInput()->withErrors([
-                'error' => 'Gagal Submit! Data Tidak Valid: ' . implode(' & ', $alasan) . '. Pastikan nama pelanggan sesuai dengan foto yang diunggah!'
-            ]);
+        // LOGIKA PERCOBAAN 1 vs PERCOBAAN 2
+        if (!$isValid) {
+            // Jika Percobaan Pertama (Retry == 0) -> Tolak & Minta Ulang
+            if ($retryCount < 1) {
+                return back()->withInput([
+                    'pengisi' => 'IKR',
+                    'nama' => $request->input('nama'),
+                    'tanggal_aktivasi' => $request->input('tanggal_aktivasi'),
+                    'stasiun' => $request->input('stasiun'),
+                    'cid' => $request->input('cid'),
+                    'sn_ont' => $request->input('sn_ont'),
+                    'no_hp' => $request->input('no_hp'),
+                    'nama_teknisi' => $request->input('nama_teknisi'),
+                    'sumber_wo' => $request->input('sumber_wo'),
+                    'pic_sales' => $request->input('pic_sales'),
+                    'retry_count' => 1 // Naikkan counter retry
+                ])->withErrors([
+                    'error' => 'Validasi Gagal (Percobaan 1): Nama pada KTP/BAST tidak cocok. Silakan periksa nama atau unggah ulang foto yang lebih jelas!'
+                ]);
+            }
+
+            // Jika Percobaan Kedua Masih Salah (Retry >= 1) -> Simpan ke PENDING / REVISI
+            $statusValidasi = 'pending';
+            $pesan = 'Data berhasil disimpan tetapi masuk status PENDING (Butuh Revisi Admin) karena validasi foto 2x gagal.';
+        } else {
+            // Jika Valid
+            $statusValidasi = 'valid';
+            $pesan = 'Data Pelanggan Ter-Validasi Otomatis dan Berhasil Disimpan!';
         }
-
-        $statusValidasi = 'valid';
     } else {
         // Sales otomatis Valid
         $statusValidasi = 'valid';
+        $pesan = 'Data Sales Berhasil Disimpan!';
     }
 
     $data = [
@@ -127,7 +145,7 @@ Route::post('/pelanggan/store', function (Request $request) {
 
     DB::table('pelanggan')->insert($data);
 
-    return back()->with('success', 'Data Pelanggan Valid dan Berhasil Disimpan!');
+    return back()->with('success', $pesan);
 })->middleware('auth');
 
 Route::post('/validasi/{id}', function (Request $request, $id) {
