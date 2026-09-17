@@ -27,7 +27,6 @@
         
         .table-container { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .search-box { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; width: 280px; font-size: 14px; }
         
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
@@ -43,12 +42,16 @@
         .btn-invalid { background-color: #dc2626; }
         .alert { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
         
-        /* Modal Styles */
+        /* Modal Form */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 400px; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 650px; max-height: 90vh; overflow-y: auto; }
         .modal-content h3 { margin-bottom: 15px; }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        .form-group input, .form-group select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        .full-width { grid-column: span 2; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         .btn-cancel { background-color: #94a3b8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
@@ -98,15 +101,14 @@
         <div class="table-container">
             <div class="table-header">
                 <h3>Daftar Antrean Validasi</h3>
-                <input type="text" class="search-box" placeholder="Cari NIK / Nama / ID Pelanggan...">
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th>ID / NIK</th>
-                        <th>Nama Pelanggan</th>
-                        <th>Alamat</th>
+                        <th>CID / Nama</th>
+                        <th>Pengisi & Stasiun</th>
+                        <th>Teknisi & Sales</th>
                         <th>Status Validasi</th>
                         <th>Aksi</th>
                     </tr>
@@ -114,9 +116,18 @@
                 <tbody>
                     @foreach($pelanggan as $item)
                     <tr>
-                        <td><strong>#PLG-00{{ $item->id }}</strong><br><small>{{ $item->nik }}</small></td>
-                        <td>{{ $item->nama }}</td>
-                        <td>{{ $item->alamat }}</td>
+                        <td>
+                            <strong>{{ $item->cid ?? 'N/A' }}</strong><br>
+                            <small>{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
+                        </td>
+                        <td>
+                            <span class="badge" style="background:#e2e8f0; color:#334155;">{{ strtoupper($item->pengisi ?? '-') }}</span><br>
+                            <small>{{ $item->stasiun ?? '-' }}</small>
+                        </td>
+                        <td>
+                            Teknisi: {{ $item->nama_teknisi ?? '-' }}<br>
+                            <small>Sales: {{ $item->pic_sales ?? '-' }}</small>
+                        </td>
                         <td>
                             @if($item->status_validasi == 'pending')
                                 <span class="badge pending">Pending</span>
@@ -149,18 +160,126 @@
         </div>
     </div>
 
-    <!-- Modal Form Input Pelanggan -->
+    <!-- Modal Form Input 14 Field -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
             <h3>Input Data Pelanggan Baru</h3>
-            <form action="/pelanggan/store" method="POST">
+            <form action="/pelanggan/store" method="POST" enctype="multipart/form-data">
                 @csrf
-                <input type="text" name="nik" placeholder="NIK Pelanggan" required>
-                <input type="text" name="nama" placeholder="Nama Lengkap" required>
-                <textarea name="alamat" placeholder="Alamat Lengkap" rows="3" required></textarea>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>1. Pengisi</label>
+                        <select name="pengisi" required>
+                            <option value="">-- Pilih Pengisi --</option>
+                            <option value="IKR">IKR</option>
+                            <option value="Sales">Sales</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>2. Tanggal Aktivasi</label>
+                        <input type="date" name="tanggal_aktivasi" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>3. Stasiun</label>
+                        <select name="stasiun" required>
+                            <option value="">-- Pilih Stasiun --</option>
+                            <option value="Tasikmalaya">Tasikmalaya</option>
+                            <option value="Randuagung">Randuagung</option>
+                            <option value="Garum">Garum</option>
+                            <option value="Semarang Poncol">Semarang Poncol</option>
+                            <option value="Mojokerto">Mojokerto</option>
+                            <option value="Surabaya Gubeng">Surabaya Gubeng</option>
+                            <option value="Malang">Malang</option>
+                            <option value="Talun">Talun</option>
+                            <option value="Kediri">Kediri</option>
+                            <option value="Tulungagung">Tulungagung</option>
+                            <option value="Jombang">Jombang</option>
+                            <option value="Probolinggo">Probolinggo</option>
+                            <option value="Wanaraja">Wanaraja</option>
+                            <option value="Pasirjengkol">Pasirjengkol</option>
+                            <option value="Wlingi">Wlingi</option>
+                            <option value="Kepanjen">Kepanjen</option>
+                            <option value="Kalioso">Kalioso</option>
+                            <option value="Salem">Salem</option>
+                            <option value="Sukoharjo">Sukoharjo</option>
+                            <option value="Kertosono">Kertosono</option>
+                            <option value="Jerakah">Jerakah</option>
+                            <option value="Nganjuk">Nganjuk</option>
+                            <option value="Gedebage">Gedebage</option>
+                            <option value="Tarik">Tarik</option>
+                            <option value="Sumbergempol">Sumbergempol</option>
+                            <option value="Cicalengka">Cicalengka</option>
+                            <option value="Sidoarjo">Sidoarjo</option>
+                            <option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option>
+                            <option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option>
+                            <option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option>
+                            <option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option>
+                            <option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option>
+                            <option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>4. CID (Customer ID)</label>
+                        <input type="text" name="cid" placeholder="Masukkan CID" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>5. SN ONT</label>
+                        <input type="text" name="sn_ont" placeholder="Masukkan SN ONT" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>6. Nama Pelanggan</label>
+                        <input type="text" name="nama" placeholder="Nama Pelanggan" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>7. No HP</label>
+                        <input type="text" name="no_hp" placeholder="Contoh: 08123456789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>8. Nama Teknisi (TIM)</label>
+                        <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>9. Sumber WO</label>
+                        <input type="text" name="sumber_wo" placeholder="Sumber WO" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>10. PIC Sales</label>
+                        <input type="text" name="pic_sales" placeholder="Nama PIC Sales" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>11. Foto KTP</label>
+                        <input type="file" name="foto_ktp" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label>12. Foto BAST Pelanggan</label>
+                        <input type="file" name="foto_bast" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label>13. Foto Pelanggan</label>
+                        <input type="file" name="foto_pelanggan" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label>14. Foto Bukti Transfer</label>
+                        <input type="file" name="foto_bukti_transfer" accept="image/*">
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-                    <button type="submit" class="btn-add">Simpan Data</button>
+                    <button type="submit" class="btn-add">Simpan Data Pelanggan</button>
                 </div>
             </form>
         </div>
