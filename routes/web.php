@@ -61,11 +61,12 @@ function ocrReadImage($file) {
     return '';
 }
 
-// ROUTE SIMPAN DENGAN LOGIKA RETRY (MAKSIMAL 2 KALI)
+// ROUTE SIMPAN DENGAN LOGIKA RETRY & REMARK REVISI
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
     $namaInput = strtoupper(trim($request->input('nama')));
     $retryCount = (int) $request->input('retry_count', 0);
+    $remark = null;
 
     if ($pengisi === 'IKR') {
         if (!$request->hasFile('foto_ktp') || !$request->hasFile('foto_bast')) {
@@ -83,9 +84,13 @@ Route::post('/pelanggan/store', function (Request $request) {
 
         $isValid = ($ktpMatched && $bastMatched);
 
-        // LOGIKA PERCOBAAN 1 vs PERCOBAAN 2
         if (!$isValid) {
-            // Jika Percobaan Pertama (Retry == 0) -> Tolak & Minta Ulang
+            $alasan = [];
+            if (!$ktpMatched) $alasan[] = 'Nama tidak ditemukan pada Foto KTP';
+            if (!$bastMatched) $alasan[] = 'Nama tidak ditemukan pada Foto BAST';
+            $teksAlasan = implode(' & ', $alasan);
+
+            // Percobaan Pertama (Retry < 1) -> Minta Input Ulang
             if ($retryCount < 1) {
                 return back()->withInput([
                     'pengisi' => 'IKR',
@@ -98,23 +103,24 @@ Route::post('/pelanggan/store', function (Request $request) {
                     'nama_teknisi' => $request->input('nama_teknisi'),
                     'sumber_wo' => $request->input('sumber_wo'),
                     'pic_sales' => $request->input('pic_sales'),
-                    'retry_count' => 1 // Naikkan counter retry
+                    'retry_count' => 1
                 ])->withErrors([
-                    'error' => 'Validasi Gagal (Percobaan 1): Nama pada KTP/BAST tidak cocok. Silakan periksa nama atau unggah ulang foto yang lebih jelas!'
+                    'error' => 'Validasi Gagal (Percobaan 1): ' . $teksAlasan . '. Silakan periksa nama atau unggah ulang foto yang lebih jelas!'
                 ]);
             }
 
-            // Jika Percobaan Kedua Masih Salah (Retry >= 1) -> Simpan ke PENDING / REVISI
+            // Percobaan Kedua Masih Salah -> Simpan ke PENDING dengan REMARK REVISI
             $statusValidasi = 'pending';
-            $pesan = 'Data berhasil disimpan tetapi masuk status PENDING (Butuh Revisi Admin) karena validasi foto 2x gagal.';
+            $remark = 'Gagal Auto-Validasi: ' . $teksAlasan;
+            $pesan = 'Data tersimpan ke antrean PENDING (Butuh Revisi) karena validasi foto 2x tidak cocok.';
         } else {
-            // Jika Valid
             $statusValidasi = 'valid';
+            $remark = 'Sesuai (Auto-Validated BY OCR)';
             $pesan = 'Data Pelanggan Ter-Validasi Otomatis dan Berhasil Disimpan!';
         }
     } else {
-        // Sales otomatis Valid
         $statusValidasi = 'valid';
+        $remark = 'Direct Sales';
         $pesan = 'Data Sales Berhasil Disimpan!';
     }
 
@@ -131,6 +137,7 @@ Route::post('/pelanggan/store', function (Request $request) {
         'sumber_wo'          => $request->input('sumber_wo'),
         'pic_sales'          => $request->input('pic_sales'),
         'status_validasi'    => $statusValidasi,
+        'remark'             => $remark,
         'created_at'         => now(),
         'updated_at'         => now(),
     ];
@@ -148,13 +155,18 @@ Route::post('/pelanggan/store', function (Request $request) {
     return back()->with('success', $pesan);
 })->middleware('auth');
 
+// Route Validasi Manual Admin
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
+    $remarkInput = $request->input('remark');
+    
     DB::table('pelanggan')->where('id', $id)->update([
         'status_validasi' => $status,
-        'updated_at' => now()
+        'remark'          => $remarkInput ?? ($status === 'valid' ? 'Disetujui Admin' : 'Ditolak Admin'),
+        'updated_at'      => now()
     ]);
-    return back()->with('success', 'Status validasi berhasil diperbarui!');
+
+    return back()->with('success', 'Status validasi & catatan revisi berhasil diperbarui!');
 })->middleware('auth');
 
 Route::delete('/pelanggan/{id}', function ($id) {
