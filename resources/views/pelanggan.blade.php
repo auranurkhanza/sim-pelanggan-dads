@@ -18,7 +18,6 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; }
 
-        /* BARIS KONTROL FILTER, SEARCH & SORT */
         .filter-bar { background-color: #1e293b; padding: 16px 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
         .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         .filter-input, .filter-select { padding: 9px 14px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
@@ -57,7 +56,6 @@
             <h1>Daftar Semua Pelanggan</h1>
         </div>
 
-        <!-- BARIS FILTER, SEARCH & SORT -->
         <form action="/pelanggan" method="GET" class="filter-bar">
             <div class="filter-group">
                 <input type="text" name="search" class="filter-input" placeholder="Cari Nama / CID / NIK..." value="{{ request('search') }}">
