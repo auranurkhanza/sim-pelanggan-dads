@@ -116,8 +116,8 @@
                     <tr>
                         <th>CID / Nama</th>
                         <th>Pengisi & Stasiun</th>
-                        <th>Teknisi / Sales</th>
                         <th>Status Validasi</th>
+                        <th>Catatan Revisi / Remark</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -134,13 +134,6 @@
                         </td>
                         <td>
                             @if($item->pengisi == 'IKR')
-                                Teknisi: {{ $item->nama_teknisi ?? '-' }}
-                            @else
-                                Sales: {{ $item->pic_sales ?? '-' }}
-                            @endif
-                        </td>
-                        <td>
-                            @if($item->pengisi == 'IKR')
                                 @if($item->status_validasi == 'pending')
                                     <span class="badge pending">Pending (Revisi)</span>
                                 @elseif($item->status_validasi == 'valid')
@@ -151,6 +144,11 @@
                             @else
                                 <span class="badge sales">Direct Sales</span>
                             @endif
+                        </td>
+                        <td>
+                            <small style="color: #64748b; font-style: italic;">
+                                {{ $item->remark ?? '-' }}
+                            </small>
                         </td>
                         <td>
                             @if($item->pengisi == 'IKR' && $item->status_validasi == 'pending')
@@ -186,7 +184,6 @@
             
             <form action="/pelanggan/store" method="POST" enctype="multipart/form-data">
                 @csrf
-                <!-- Field Tersembunyi untuk Menghitung Jumlah Percobaan -->
                 <input type="hidden" name="retry_count" value="{{ old('retry_count', 0) }}">
 
                 <div class="form-grid">
@@ -387,7 +384,6 @@
             }
         }
 
-        // Buka otomatis modal jika ada error pemicu retry
         @if($errors->has('error'))
             openModal();
         @endif
