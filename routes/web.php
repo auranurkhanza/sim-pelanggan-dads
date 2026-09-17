@@ -26,7 +26,7 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-// Menu 1: Validasi Data (Hanya menampilkan antrean data IKR)
+// Menu 1: Validasi Data (IKR)
 Route::get('/dashboard', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('dashboard', compact('pelanggan'));
@@ -44,7 +44,7 @@ Route::get('/laporan', function () {
     return view('laporan', compact('pelanggan'));
 })->middleware('auth');
 
-// ROUTE SIMPAN DATA (Bedakan status otomatis antara IKR & Sales)
+// ROUTE SIMPAN DATA (Diperbarui dengan fallback '-' untuk NIK)
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
 
@@ -55,20 +55,21 @@ Route::post('/pelanggan/store', function (Request $request) {
         'cid'                => $request->input('cid'),
         'sn_ont'             => $request->input('sn_ont'),
         'nama'               => $request->input('nama'),
-        'nik'                => $request->input('nik'),
+        'nik'                => $request->input('nik') ?? '-', // Menghindari error null jika diisi dari IKR
         'no_hp'              => $request->input('no_hp'),
         'nama_teknisi'       => $request->input('nama_teknisi'),
         'sumber_wo'          => $request->input('sumber_wo'),
         'pic_sales'          => $request->input('pic_sales'),
         
         // JIKA IKR -> PERLU VALIDASI (PENDING)
-        // JIKA SALES -> LANGSUNG VALID / TIDAK PERLU VALIDASI IKR
+        // JIKA SALES -> LANGSUNG VALID / TERMASUK MASTER DATA
         'status_validasi'    => ($pengisi === 'IKR') ? 'pending' : 'valid',
         
         'created_at'         => now(),
         'updated_at'         => now(),
     ];
 
+    // Simpan file foto (jika ada)
     $fotoFields = ['foto_ktp', 'foto_bast', 'foto_pelanggan', 'foto_bukti_transfer'];
     foreach ($fotoFields as $field) {
         if ($request->hasFile($field)) {
@@ -86,7 +87,7 @@ Route::post('/pelanggan/store', function (Request $request) {
     return back()->with('success', $msg);
 })->middleware('auth');
 
-// Route Validasi (Setujui / Tolak oleh Admin)
+// Route Validasi (Setujui / Tolak)
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
     DB::table('pelanggan')->where('id', $id)->update([
@@ -96,7 +97,7 @@ Route::post('/validasi/{id}', function (Request $request, $id) {
     return back()->with('success', 'Status validasi berhasil diperbarui!');
 })->middleware('auth');
 
-// Route Hapus Pelanggan
+// Route Hapus Data Pelanggan
 Route::delete('/pelanggan/{id}', function ($id) {
     DB::table('pelanggan')->where('id', $id)->delete();
     return back()->with('success', 'Data pelanggan berhasil dihapus!');
