@@ -18,6 +18,8 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 22px; color: #0f172a; }
         
+        .btn-add { background-color: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .card { background: white; padding: 18px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .card h3 { font-size: 13px; color: #64748b; margin-bottom: 8px; }
@@ -40,6 +42,14 @@
         .btn-valid { background-color: #16a34a; }
         .btn-invalid { background-color: #dc2626; }
         .alert { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 400px; }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-cancel { background-color: #94a3b8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -59,31 +69,29 @@
     <div class="main-content">
         <div class="header">
             <h1>Validasi Data Pelanggan</h1>
-            <span>Petugas: <strong>Admin DADS</strong></span>
+            <button class="btn-add" onclick="openModal()">+ Input Pelanggan Baru</button>
         </div>
 
         @if(session('success'))
-            <div class="alert">
-                {{ session('success') }}
-            </div>
+            <div class="alert">{{ session('success') }}</div>
         @endif
 
         <div class="cards">
             <div class="card">
                 <h3>Total Pengajuan</h3>
-                <div class="number">120</div>
+                <div class="number">{{ count($pelanggan) }}</div>
             </div>
             <div class="card">
                 <h3>Belum Divalidasi</h3>
-                <div class="number" style="color: #d97706;">15</div>
+                <div class="number" style="color: #d97706;">{{ $pelanggan->where('status_validasi', 'pending')->count() }}</div>
             </div>
             <div class="card">
                 <h3>Data Valid</h3>
-                <div class="number" style="color: #16a34a;">98</div>
+                <div class="number" style="color: #16a34a;">{{ $pelanggan->where('status_validasi', 'valid')->count() }}</div>
             </div>
             <div class="card">
                 <h3>Data Tidak Valid</h3>
-                <div class="number" style="color: #dc2626;">7</div>
+                <div class="number" style="color: #dc2626;">{{ $pelanggan->where('status_validasi', 'invalid')->count() }}</div>
             </div>
         </div>
 
@@ -104,37 +112,64 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @foreach($pelanggan as $item)
                     <tr>
-                        <td><strong>#PLG-001</strong><br><small>3275012304950001</small></td>
-                        <td>Aura Nur Khanza</td>
-                        <td>Jl. Jatiwaringin No. 45</td>
-                        <td><span class="badge pending">Pending</span></td>
+                        <td><strong>#PLG-00{{ $item->id }}</strong><br><small>{{ $item->nik }}</small></td>
+                        <td>{{ $item->nama }}</td>
+                        <td>{{ $item->alamat }}</td>
                         <td>
-                            <form action="/validasi/1" method="POST" style="display:inline;">
-                                @csrf
-                                <input type="hidden" name="status" value="valid">
-                                <button type="submit" class="btn-action btn-valid">Setujui</button>
-                            </form>
-                            <form action="/validasi/1" method="POST" style="display:inline;">
-                                @csrf
-                                <input type="hidden" name="status" value="invalid">
-                                <button type="submit" class="btn-action btn-invalid">Tolak</button>
-                            </form>
+                            @if($item->status_validasi == 'pending')
+                                <span class="badge pending">Pending</span>
+                            @elseif($item->status_validasi == 'valid')
+                                <span class="badge valid">Valid</span>
+                            @else
+                                <span class="badge invalid">Tidak Valid</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($item->status_validasi == 'pending')
+                                <form action="/validasi/{{ $item->id }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="status" value="valid">
+                                    <button type="submit" class="btn-action btn-valid">Setujui</button>
+                                </form>
+                                <form action="/validasi/{{ $item->id }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="status" value="invalid">
+                                    <button type="submit" class="btn-action btn-invalid">Tolak</button>
+                                </form>
+                            @else
+                                <span style="color: #64748b; font-size: 12px;">Selesai</span>
+                            @endif
                         </td>
                     </tr>
-                    <tr>
-                        <td><strong>#PLG-002</strong><br><small>3275081203880004</small></td>
-                        <td>PT Pegadaian</td>
-                        <td>Jl. Dago No. 102, Bandung</td>
-                        <td><span class="badge valid">Valid</span></td>
-                        <td>
-                            <span style="color: #64748b; font-size: 12px;">Terverifikasi</span>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Modal Form Input Pelanggan -->
+    <div class="modal" id="inputModal">
+        <div class="modal-content">
+            <h3>Input Data Pelanggan Baru</h3>
+            <form action="/pelanggan/store" method="POST">
+                @csrf
+                <input type="text" name="nik" placeholder="NIK Pelanggan" required>
+                <input type="text" name="nama" placeholder="Nama Lengkap" required>
+                <textarea name="alamat" placeholder="Alamat Lengkap" rows="3" required></textarea>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-add">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() { document.getElementById('inputModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+    </script>
 
 </body>
 </html>
