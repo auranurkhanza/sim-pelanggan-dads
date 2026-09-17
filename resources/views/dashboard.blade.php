@@ -147,7 +147,6 @@
                             @endif
                         </td>
                         <td>
-                            <!-- HANYA TAMPILKAN TOMBOL VALIDASI JIKA DARI IKR & STATUSNYA PENDING -->
                             @if($item->pengisi == 'IKR' && $item->status_validasi == 'pending')
                                 <form action="/validasi/{{ $item->id }}" method="POST" style="display:inline;">
                                     @csrf
@@ -227,10 +226,19 @@
                             <label>8. Nama Teknisi (TIM)</label>
                             <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" class="ikr-input">
                         </div>
+
+                        <!-- DROPDOWN SUMBER WO -->
                         <div class="form-group">
                             <label>9. Sumber WO</label>
-                            <input type="text" name="sumber_wo" placeholder="Sumber WO" class="ikr-input">
+                            <select name="sumber_wo" class="ikr-input">
+                                <option value="">-- Pilih Sumber WO --</option>
+                                <option value="Door to Door">Door to Door</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Program">Program</option>
+                                <option value="Affiliate">Affiliate</option>
+                            </select>
                         </div>
+
                         <div class="form-group full-width">
                             <label>10. PIC Sales</label>
                             <input type="text" name="pic_sales" placeholder="Nama PIC Sales" class="ikr-input">
