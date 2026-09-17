@@ -26,25 +26,22 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-// Menu 1: Validasi Data
 Route::get('/dashboard', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('dashboard', compact('pelanggan'));
 })->middleware('auth');
 
-// Menu 2: Semua Pelanggan
 Route::get('/pelanggan', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('pelanggan', compact('pelanggan'));
 })->middleware('auth');
 
-// Menu 3: Laporan Validasi
 Route::get('/laporan', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('laporan', compact('pelanggan'));
 })->middleware('auth');
 
-// Route Simpan Pelanggan Baru
+// ROUTE SIMPAN DATA (Diperbarui dengan NIK)
 Route::post('/pelanggan/store', function (Request $request) {
     $data = [
         'pengisi'            => $request->input('pengisi'),
@@ -53,6 +50,7 @@ Route::post('/pelanggan/store', function (Request $request) {
         'cid'                => $request->input('cid'),
         'sn_ont'             => $request->input('sn_ont'),
         'nama'               => $request->input('nama'),
+        'nik'                => $request->input('nik'), // Tambahan khusus Sales
         'no_hp'              => $request->input('no_hp'),
         'nama_teknisi'       => $request->input('nama_teknisi'),
         'sumber_wo'          => $request->input('sumber_wo'),
@@ -71,23 +69,18 @@ Route::post('/pelanggan/store', function (Request $request) {
     }
 
     DB::table('pelanggan')->insert($data);
-
     return back()->with('success', 'Data pelanggan berhasil dikirim untuk divalidasi!');
 })->middleware('auth');
 
-// Route Aksi Validasi (Setujui / Tolak)
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
-    
     DB::table('pelanggan')->where('id', $id)->update([
         'status_validasi' => $status,
         'updated_at' => now()
     ]);
-
     return back()->with('success', 'Status validasi berhasil diperbarui!');
 })->middleware('auth');
 
-// ROUTE BARU: Hapus Data Pelanggan
 Route::delete('/pelanggan/{id}', function ($id) {
     DB::table('pelanggan')->where('id', $id)->delete();
     return back()->with('success', 'Data pelanggan berhasil dihapus!');
