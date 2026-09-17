@@ -8,7 +8,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { display: flex; height: 100vh; background-color: #0f172a; color: #f8fafc; }
         
-        /* Sidebar Bertema Starlite (Dark Navy & Neon Cyan) */
         .sidebar { width: 260px; background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%); color: white; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; }
         .sidebar h2 { font-size: 16px; font-weight: 800; margin-bottom: 25px; color: #38bdf8; border-bottom: 2px solid #0284c7; padding-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
         .menu a { display: block; color: #94a3b8; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s; }
@@ -16,7 +15,6 @@
         .logout-btn { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; font-weight: 600; transition: background 0.2s; }
         .logout-btn:hover { background-color: #dc2626; }
         
-        /* Main Content */
         .main-content { flex: 1; padding: 28px; overflow-y: auto; background-color: #0f172a; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; letter-spacing: -0.5px; }
@@ -25,13 +23,11 @@
         .btn-export { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; margin-right: 10px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); transition: transform 0.2s; }
         .btn-export:hover { transform: translateY(-2px); }
         
-        /* Stats Cards */
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 28px; }
         .card { background-color: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2); }
         .card h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .card .number { font-size: 26px; font-weight: 800; color: #f8fafc; }
         
-        /* Table Style */
         .table-container { background-color: #1e293b; padding: 22px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
         .table-header h3 { font-size: 16px; color: #38bdf8; font-weight: 700; }
@@ -41,14 +37,12 @@
         th { background-color: #0f172a; color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
         td { color: #e2e8f0; }
         
-        /* Badges */
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
         .badge.valid { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
         .badge.pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
         .badge.invalid { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
         .badge.sales { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
         
-        /* Buttons Action */
         .btn-action { padding: 7px 12px; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: white; text-decoration: none; margin-right: 4px; }
         .btn-valid { background-color: #10b981; }
         .btn-invalid { background-color: #ef4444; }
@@ -57,7 +51,6 @@
         .alert-success { padding: 14px; background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; border-radius: 8px; margin-bottom: 22px; font-size: 14px; }
         .alert-danger { padding: 14px; background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; margin-bottom: 22px; font-size: 14px; }
         
-        /* Modal Form */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         .modal-content { background-color: #1e293b; padding: 28px; border-radius: 12px; border: 1px solid #334155; width: 680px; max-height: 90vh; overflow-y: auto; color: #f8fafc; }
         .modal-content h3 { margin-bottom: 18px; color: #38bdf8; font-size: 18px; }
@@ -79,7 +72,7 @@
         <div>
             <h2>SIVALID STARLITE DADS</h2>
             <div class="menu">
-                <a href="/dashboard" class="active">Validasi Data (IKR)</a>
+                <a href="/dashboard" class="active">Validasi Data</a>
                 <a href="/pelanggan">Semua Pelanggan</a>
                 <a href="/laporan">Laporan Validasi</a>
             </div>
@@ -89,7 +82,7 @@
 
     <div class="main-content">
         <div class="header">
-            <h1>Validasi Data Pelanggan IKR</h1>
+            <h1>Validasi Data Pelanggan</h1>
             <div>
                 <a href="/pelanggan/export" class="btn-export">📊 Export Excel (CSV)</a>
                 <button class="btn-add" onclick="openModal()">+ Input Pelanggan Baru</button>
@@ -106,7 +99,7 @@
 
         <div class="cards">
             <div class="card">
-                <h3>Total Pengajuan IKR</h3>
+                <h3>Total Pengajuan</h3>
                 <div class="number">{{ $pelanggan->where('pengisi', 'IKR')->count() }}</div>
             </div>
             <div class="card">
@@ -125,7 +118,7 @@
 
         <div class="table-container">
             <div class="table-header">
-                <h3>Daftar Antrean Validasi IKR (Starlite FTTH)</h3>
+                <h3>Daftar Antrean Validasi (Starlite FTTH)</h3>
             </div>
             
             <table>
@@ -217,7 +210,7 @@
                     <!-- FORM KHUSUS IKR (14 Data) -->
                     <div id="formIKR" class="form-section">
                         <h4 style="color:#38bdf8; margin-bottom:15px; grid-column: span 2;">
-                            Form Input Khusus IKR (Teknisi)
+                            Form Input Khusus Teknisi
                             @if(old('retry_count', 0) >= 1)
                                 <span style="color:#f87171; font-size:12px; font-weight:bold;">[Percobaan Ke-2: Jika foto tetap tidak cocok, data akan masuk PENDING]</span>
                             @endif
@@ -395,6 +388,7 @@
                 inputsIKR.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
             } 
             else if (selected === 'Sales') {
+                formSales.style.display = 'none';
                 formSales.style.display = 'grid';
                 btnSubmit.style.display = 'block';
                 inputsSales.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
