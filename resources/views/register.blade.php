@@ -81,6 +81,11 @@
             cursor: pointer; 
             margin-top: 8px; 
             box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4); 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
         }
 
         .link-login {
@@ -102,6 +107,12 @@
             margin-bottom: 18px; 
             text-align: left; 
         }
+
+        .footer-text {
+            margin-top: 24px;
+            font-size: 11px;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -112,8 +123,8 @@
 
         <hr class="brand-divider">
 
-        <h3>Daftar Akun Baru</h3>
-        <p>Buat akun petugas untuk mengakses sistem</p>
+        <h3>Daftar Akun Petugas</h3>
+        <p>Buat akun petugas baru untuk mengakses sistem</p>
 
         @if($errors->any())
             <div class="error-msg">
@@ -142,6 +153,10 @@
         </form>
 
         <a href="/login" class="link-login">Sudah punya akun? Login di sini</a>
+
+        <div class="footer-text">
+            &copy; {{ date('Y') }} STARLITE x PT DADS. All Rights Reserved.
+        </div>
     </div>
 
 </body>
