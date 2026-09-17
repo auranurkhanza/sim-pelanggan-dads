@@ -5,11 +5,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Hash;
 
 Route::get('/', function () {
     return redirect('/login');
 });
 
+// ROUTE LOGIN
 Route::get('/login', function () {
     return view('login');
 })->name('login');
@@ -25,7 +27,33 @@ Route::post('/login', function (Request $request) {
     return back()->withErrors(['email' => 'Email atau password salah.']);
 });
 
-// ROUTE DASHBOARD
+// ROUTE REGISTER (PENDAFTARAN AKUN BARU)
+Route::get('/register', function () {
+    return view('register');
+});
+
+Route::post('/register', function (Request $request) {
+    $request->validate([
+        'name'     => 'required|string|max:255',
+        'email'    => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6',
+    ], [
+        'email.unique'   => 'Email ini sudah terdaftar, silakan gunakan email lain atau login.',
+        'password.min'   => 'Password minimal harus 6 karakter.'
+    ]);
+
+    DB::table('users')->insert([
+        'name'       => $request->input('name'),
+        'email'      => $request->input('email'),
+        'password'   => Hash::make($request->input('password')),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return redirect('/login')->with('success', 'Akun berhasil dibuat! Silakan login.');
+});
+
+// ROUTE DASHBOARD (Dengan Filter, Search & Sort)
 Route::get('/dashboard', function (Request $request) {
     $query = DB::table('pelanggan');
 
