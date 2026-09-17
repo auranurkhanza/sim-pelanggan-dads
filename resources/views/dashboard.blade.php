@@ -28,7 +28,6 @@
         .card h3 { font-size: 13px; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .card .number { font-size: 26px; font-weight: 800; color: #f8fafc; }
 
-        /* BARIS KONTROL FILTER, SEARCH & SORT */
         .filter-bar { background-color: #1e293b; padding: 16px 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
         .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         .filter-input, .filter-select { padding: 9px 14px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
@@ -124,7 +123,6 @@
             </div>
         </div>
 
-        <!-- FORM FILTER & SORT TERUS DITAMPILKAN DI ATAS TABEL -->
         <form action="/dashboard" method="GET" class="filter-bar">
             <div class="filter-group">
                 <input type="text" name="search" class="filter-input" placeholder="Cari Nama / CID / NIK..." value="{{ request('search') }}">
