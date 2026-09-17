@@ -40,7 +40,9 @@
         .btn-valid { background-color: #16a34a; }
         .btn-invalid { background-color: #dc2626; }
         .btn-delete { background-color: #64748b; }
-        .alert { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        
+        .alert-success { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
+        .alert-danger { padding: 12px; background-color: #fee2e2; color: #991b1b; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
         
         /* Modal Form */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
@@ -78,7 +80,11 @@
         </div>
 
         @if(session('success'))
-            <div class="alert">{{ session('success') }}</div>
+            <div class="alert-success">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->has('error'))
+            <div class="alert-danger">{{ $errors->first('error') }}</div>
         @endif
 
         <div class="cards">
