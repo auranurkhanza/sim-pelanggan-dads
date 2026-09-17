@@ -20,10 +20,18 @@ Route::post('/login', function (Request $request) {
     // Cek autentikasi user
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        return "Berhasil Login! Selamat datang di SIM Pelanggan DADS.";
+        
+        // DIUBAH DI SINI:
+        // Mengarahkan ke halaman dashboard/utama setelah berhasil login
+        return redirect()->intended('/dashboard'); 
     }
 
     return back()->withErrors([
         'email' => 'Email atau password salah.',
     ]);
 });
+
+// Route halaman dashboard (contoh)
+Route::get('/dashboard', function () {
+    return view('dashboard'); // atau return "Selamat Datang di Dashboard SIM Pelanggan DADS";
+})->middleware('auth');
