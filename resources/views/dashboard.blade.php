@@ -142,7 +142,7 @@
                         <td>
                             @if($item->pengisi == 'IKR')
                                 @if($item->status_validasi == 'pending')
-                                    <span class="badge pending">Pending</span>
+                                    <span class="badge pending">Pending (Revisi)</span>
                                 @elseif($item->status_validasi == 'valid')
                                     <span class="badge valid">Valid</span>
                                 @else
@@ -186,75 +186,108 @@
             
             <form action="/pelanggan/store" method="POST" enctype="multipart/form-data">
                 @csrf
+                <!-- Field Tersembunyi untuk Menghitung Jumlah Percobaan -->
+                <input type="hidden" name="retry_count" value="{{ old('retry_count', 0) }}">
+
                 <div class="form-grid">
                     
                     <div class="form-group full-width">
                         <label>1. Pilih Tipe Pengisi Data</label>
                         <select name="pengisi" id="pengisiSelect" onchange="toggleFormByPengisi()" required>
                             <option value="">-- Pilih Tipe Pengisi --</option>
-                            <option value="IKR">IKR (Teknisi - Perlu Validasi)</option>
-                            <option value="Sales">Sales (Langsung Tersimpan)</option>
+                            <option value="IKR" {{ old('pengisi') == 'IKR' ? 'selected' : '' }}>IKR (Teknisi - Perlu Validasi)</option>
+                            <option value="Sales" {{ old('pengisi') == 'Sales' ? 'selected' : '' }}>Sales (Langsung Tersimpan)</option>
                         </select>
                     </div>
 
                     <!-- FORM KHUSUS IKR (14 Data) -->
                     <div id="formIKR" class="form-section">
-                        <h4 style="color:#0284c7; margin-bottom:15px; grid-column: span 2;">Form Input Khusus IKR (Teknisi)</h4>
+                        <h4 style="color:#0284c7; margin-bottom:15px; grid-column: span 2;">
+                            Form Input Khusus IKR (Teknisi)
+                            @if(old('retry_count', 0) >= 1)
+                                <span style="color:#dc2626; font-size:12px; font-weight:bold;">[Percobaan Ke-2: Jika foto tetap tidak cocok, data akan masuk PENDING]</span>
+                            @endif
+                        </h4>
                         
                         <div class="form-group">
                             <label>2. Tanggal Aktivasi</label>
-                            <input type="date" name="tanggal_aktivasi" class="ikr-input">
+                            <input type="date" name="tanggal_aktivasi" class="ikr-input" value="{{ old('tanggal_aktivasi') }}">
                         </div>
                         <div class="form-group">
                             <label>3. Stasiun</label>
                             <select name="stasiun" class="ikr-input">
                                 <option value="">-- Pilih Stasiun --</option>
-                                <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option><option value="Semarang Poncol">Semarang Poncol</option><option value="Mojokerto">Mojokerto</option><option value="Surabaya Gubeng">Surabaya Gubeng</option><option value="Malang">Malang</option><option value="Talun">Talun</option><option value="Kediri">Kediri</option><option value="Tulungagung">Tulungagung</option><option value="Jombang">Jombang</option><option value="Probolinggo">Probolinggo</option><option value="Wanaraja">Wanaraja</option><option value="Pasirjengkol">Pasirjengkol</option><option value="Wlingi">Wlingi</option><option value="Kepanjen">Kepanjen</option><option value="Kalioso">Kalioso</option><option value="Salem">Salem</option><option value="Sukoharjo">Sukoharjo</option><option value="Kertosono">Kertosono</option><option value="Jerakah">Jerakah</option><option value="Nganjuk">Nganjuk</option><option value="Gedebage">Gedebage</option><option value="Tarik">Tarik</option><option value="Sumbergempol">Sumbergempol</option><option value="Cicalengka">Cicalengka</option><option value="Sidoarjo">Sidoarjo</option><option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option><option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option><option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option><option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option><option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option><option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
+                                <option value="Tasikmalaya" {{ old('stasiun') == 'Tasikmalaya' ? 'selected' : '' }}>Tasikmalaya</option>
+                                <option value="Randuagung" {{ old('stasiun') == 'Randuagung' ? 'selected' : '' }}>Randuagung</option>
+                                <option value="Garum" {{ old('stasiun') == 'Garum' ? 'selected' : '' }}>Garum</option>
+                                <option value="Semarang Poncol" {{ old('stasiun') == 'Semarang Poncol' ? 'selected' : '' }}>Semarang Poncol</option>
+                                <option value="Mojokerto" {{ old('stasiun') == 'Mojokerto' ? 'selected' : '' }}>Mojokerto</option>
+                                <option value="Surabaya Gubeng" {{ old('stasiun') == 'Surabaya Gubeng' ? 'selected' : '' }}>Surabaya Gubeng</option>
+                                <option value="Malang" {{ old('stasiun') == 'Malang' ? 'selected' : '' }}>Malang</option>
+                                <option value="Talun" {{ old('stasiun') == 'Talun' ? 'selected' : '' }}>Talun</option>
+                                <option value="Kediri" {{ old('stasiun') == 'Kediri' ? 'selected' : '' }}>Kediri</option>
+                                <option value="Tulungagung" {{ old('stasiun') == 'Tulungagung' ? 'selected' : '' }}>Tulungagung</option>
+                                <option value="Jombang" {{ old('stasiun') == 'Jombang' ? 'selected' : '' }}>Jombang</option>
+                                <option value="Probolinggo" {{ old('stasiun') == 'Probolinggo' ? 'selected' : '' }}>Probolinggo</option>
+                                <option value="Wanaraja" {{ old('stasiun') == 'Wanaraja' ? 'selected' : '' }}>Wanaraja</option>
+                                <option value="Pasirjengkol" {{ old('stasiun') == 'Pasirjengkol' ? 'selected' : '' }}>Pasirjengkol</option>
+                                <option value="Wlingi" {{ old('stasiun') == 'Wlingi' ? 'selected' : '' }}>Wlingi</option>
+                                <option value="Kepanjen" {{ old('stasiun') == 'Kepanjen' ? 'selected' : '' }}>Kepanjen</option>
+                                <option value="Kalioso" {{ old('stasiun') == 'Kalioso' ? 'selected' : '' }}>Kalioso</option>
+                                <option value="Salem" {{ old('stasiun') == 'Salem' ? 'selected' : '' }}>Salem</option>
+                                <option value="Sukoharjo" {{ old('stasiun') == 'Sukoharjo' ? 'selected' : '' }}>Sukoharjo</option>
+                                <option value="Kertosono" {{ old('stasiun') == 'Kertosono' ? 'selected' : '' }}>Kertosono</option>
+                                <option value="Jerakah" {{ old('stasiun') == 'Jerakah' ? 'selected' : '' }}>Jerakah</option>
+                                <option value="Nganjuk" {{ old('stasiun') == 'Nganjuk' ? 'selected' : '' }}>Nganjuk</option>
+                                <option value="Gedebage" {{ old('stasiun') == 'Gedebage' ? 'selected' : '' }}>Gedebage</option>
+                                <option value="Tarik" {{ old('stasiun') == 'Tarik' ? 'selected' : '' }}>Tarik</option>
+                                <option value="Sumbergempol" {{ old('stasiun') == 'Sumbergempol' ? 'selected' : '' }}>Sumbergempol</option>
+                                <option value="Cicalengka" {{ old('stasiun') == 'Cicalengka' ? 'selected' : '' }}>Cicalengka</option>
+                                <option value="Sidoarjo" {{ old('stasiun') == 'Sidoarjo' ? 'selected' : '' }}>Sidoarjo</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>4. CID (Customer ID)</label>
-                            <input type="text" name="cid" placeholder="Masukkan CID" class="ikr-input">
+                            <input type="text" name="cid" placeholder="Masukkan CID" class="ikr-input" value="{{ old('cid') }}">
                         </div>
                         <div class="form-group">
                             <label>5. SN ONT</label>
-                            <input type="text" name="sn_ont" placeholder="Masukkan SN ONT" class="ikr-input">
+                            <input type="text" name="sn_ont" placeholder="Masukkan SN ONT" class="ikr-input" value="{{ old('sn_ont') }}">
                         </div>
                         <div class="form-group">
                             <label>6. Nama Pelanggan</label>
-                            <input type="text" name="nama" placeholder="Nama Pelanggan" class="ikr-input">
+                            <input type="text" name="nama" placeholder="Nama Pelanggan" class="ikr-input" value="{{ old('nama') }}">
                         </div>
                         <div class="form-group">
                             <label>7. No HP</label>
-                            <input type="text" name="no_hp" placeholder="Contoh: 08123456789" class="ikr-input">
+                            <input type="text" name="no_hp" placeholder="Contoh: 08123456789" class="ikr-input" value="{{ old('no_hp') }}">
                         </div>
                         <div class="form-group">
                             <label>8. Nama Teknisi (TIM)</label>
-                            <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" class="ikr-input">
+                            <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" class="ikr-input" value="{{ old('nama_teknisi') }}">
                         </div>
 
-                        <!-- DROPDOWN SUMBER WO -->
                         <div class="form-group">
                             <label>9. Sumber WO</label>
                             <select name="sumber_wo" class="ikr-input">
                                 <option value="">-- Pilih Sumber WO --</option>
-                                <option value="Door to Door">Door to Door</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Program">Program</option>
-                                <option value="Affiliate">Affiliate</option>
+                                <option value="Door to Door" {{ old('sumber_wo') == 'Door to Door' ? 'selected' : '' }}>Door to Door</option>
+                                <option value="Sales" {{ old('sumber_wo') == 'Sales' ? 'selected' : '' }}>Sales</option>
+                                <option value="Program" {{ old('sumber_wo') == 'Program' ? 'selected' : '' }}>Program</option>
+                                <option value="Affiliate" {{ old('sumber_wo') == 'Affiliate' ? 'selected' : '' }}>Affiliate</option>
                             </select>
                         </div>
 
                         <div class="form-group full-width">
                             <label>10. PIC Sales</label>
-                            <input type="text" name="pic_sales" placeholder="Nama PIC Sales" class="ikr-input">
+                            <input type="text" name="pic_sales" placeholder="Nama PIC Sales" class="ikr-input" value="{{ old('pic_sales') }}">
                         </div>
                         <div class="form-group">
-                            <label>11. Foto KTP</label>
+                            <label>11. Foto KTP (Unggah Foto Jelas)</label>
                             <input type="file" name="foto_ktp" accept="image/*" class="ikr-input">
                         </div>
                         <div class="form-group">
-                            <label>12. Foto BAST Pelanggan</label>
+                            <label>12. Foto BAST Pelanggan (Unggah Foto Jelas)</label>
                             <input type="file" name="foto_bast" accept="image/*" class="ikr-input">
                         </div>
                         <div class="form-group">
@@ -283,7 +316,7 @@
                             <label>4. Stasiun</label>
                             <select name="stasiun" class="sales-input">
                                 <option value="">-- Pilih Stasiun --</option>
-                                <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option><option value="Semarang Poncol">Semarang Poncol</option><option value="Mojokerto">Mojokerto</option><option value="Surabaya Gubeng">Surabaya Gubeng</option><option value="Malang">Malang</option><option value="Talun">Talun</option><option value="Kediri">Kediri</option><option value="Tulungagung">Tulungagung</option><option value="Jombang">Jombang</option><option value="Probolinggo">Probolinggo</option><option value="Wanaraja">Wanaraja</option><option value="Pasirjengkol">Pasirjengkol</option><option value="Wlingi">Wlingi</option><option value="Kepanjen">Kepanjen</option><option value="Kalioso">Kalioso</option><option value="Salem">Salem</option><option value="Sukoharjo">Sukoharjo</option><option value="Kertosono">Kertosono</option><option value="Jerakah">Jerakah</option><option value="Nganjuk">Nganjuk</option><option value="Gedebage">Gedebage</option><option value="Tarik">Tarik</option><option value="Sumbergempol">Sumbergempol</option><option value="Cicalengka">Cicalengka</option><option value="Sidoarjo">Sidoarjo</option><option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option><option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option><option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option><option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option><option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option><option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
+                                <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -353,6 +386,11 @@
                 inputsSales.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
             }
         }
+
+        // Buka otomatis modal jika ada error pemicu retry
+        @if($errors->has('error'))
+            openModal();
+        @endif
     </script>
 
 </body>
