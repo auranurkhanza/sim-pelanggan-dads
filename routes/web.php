@@ -26,12 +26,25 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
+// Menu 1: Validasi Data
 Route::get('/dashboard', function () {
     $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
     return view('dashboard', compact('pelanggan'));
 })->middleware('auth');
 
-// Route Simpan Pelanggan Baru dengan 14 Field & Upload Foto
+// Menu 2: Semua Pelanggan
+Route::get('/pelanggan', function () {
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+    return view('pelanggan', compact('pelanggan'));
+})->middleware('auth');
+
+// Menu 3: Laporan Validasi
+Route::get('/laporan', function () {
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+    return view('laporan', compact('pelanggan'));
+})->middleware('auth');
+
+// Route Simpan Pelanggan Baru
 Route::post('/pelanggan/store', function (Request $request) {
     $data = [
         'pengisi'            => $request->input('pengisi'),
@@ -49,7 +62,6 @@ Route::post('/pelanggan/store', function (Request $request) {
         'updated_at'         => now(),
     ];
 
-    // Proses Simpan File Foto (jika diupload)
     $fotoFields = ['foto_ktp', 'foto_bast', 'foto_pelanggan', 'foto_bukti_transfer'];
     foreach ($fotoFields as $field) {
         if ($request->hasFile($field)) {
@@ -63,7 +75,7 @@ Route::post('/pelanggan/store', function (Request $request) {
     return back()->with('success', 'Data pelanggan berhasil dikirim untuk divalidasi!');
 })->middleware('auth');
 
-// Route Aksi Setujui / Tolak
+// Route Aksi Validasi
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
     
