@@ -39,6 +39,7 @@
         .btn-action { padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; color: white; text-decoration: none; }
         .btn-valid { background-color: #16a34a; }
         .btn-invalid { background-color: #dc2626; }
+        .alert { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -60,6 +61,12 @@
             <h1>Validasi Data Pelanggan</h1>
             <span>Petugas: <strong>Admin DADS</strong></span>
         </div>
+
+        @if(session('success'))
+            <div class="alert">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <div class="cards">
             <div class="card">
@@ -103,8 +110,16 @@
                         <td>Jl. Jatiwaringin No. 45</td>
                         <td><span class="badge pending">Pending</span></td>
                         <td>
-                            <button class="btn-action btn-valid">Setujui</button>
-                            <button class="btn-action btn-invalid">Tolak</button>
+                            <form action="/validasi/1" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="status" value="valid">
+                                <button type="submit" class="btn-action btn-valid">Setujui</button>
+                            </form>
+                            <form action="/validasi/1" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="status" value="invalid">
+                                <button type="submit" class="btn-action btn-invalid">Tolak</button>
+                            </form>
                         </td>
                     </tr>
                     <tr>
