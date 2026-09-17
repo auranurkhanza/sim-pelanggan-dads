@@ -155,7 +155,7 @@ Route::post('/pelanggan/store', function (Request $request) {
     return back()->with('success', $pesan);
 })->middleware('auth');
 
-// Route Validasi Manual Admin
+// ROUTE VALIDASI MANUAL ADMIN
 Route::post('/validasi/{id}', function (Request $request, $id) {
     $status = $request->input('status');
     $remarkInput = $request->input('remark');
@@ -166,9 +166,54 @@ Route::post('/validasi/{id}', function (Request $request, $id) {
         'updated_at'      => now()
     ]);
 
-    return back()->with('success', 'Status validasi & catatan revisi berhasil diperbarui!');
+    return back()->with('success', 'Status validasi berhasil diperbarui!');
 })->middleware('auth');
 
+// ROUTE EXPORT DATA KE CSV / EXCEL
+Route::get('/pelanggan/export', function () {
+    $fileName = 'data_pelanggan_' . date('Y-m-d_H-i-s') . '.csv';
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+
+    $headers = array(
+        "Content-type"        => "text/csv",
+        "Content-Disposition" => "attachment; filename=$fileName",
+        "Pragma"              => "no-cache",
+        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        "Expires"             => "0"
+    );
+
+    $columns = array('ID', 'Tipe Pengisi', 'Tgl Aktivasi', 'Stasiun', 'CID', 'SN ONT', 'Nama Pelanggan', 'NIK', 'No HP', 'Nama Teknisi', 'Sumber WO', 'PIC Sales', 'Status Validasi', 'Catatan / Remark');
+
+    $callback = function() use($pelanggan, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+
+        foreach ($pelanggan as $item) {
+            fputcsv($file, array(
+                $item->id,
+                $item->pengisi,
+                $item->tanggal_aktivasi,
+                $item->stasiun,
+                $item->cid,
+                $item->sn_ont,
+                $item->nama,
+                $item->nik,
+                $item->no_hp,
+                $item->nama_teknisi,
+                $item->sumber_wo,
+                $item->pic_sales,
+                $item->status_validasi,
+                $item->remark
+            ));
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+})->middleware('auth');
+
+// ROUTE HAPUS DATA
 Route::delete('/pelanggan/{id}', function ($id) {
     DB::table('pelanggan')->where('id', $id)->delete();
     return back()->with('success', 'Data pelanggan berhasil dihapus!');
