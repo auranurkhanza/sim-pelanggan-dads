@@ -37,9 +37,10 @@
         .badge.pending { background-color: #fef9c3; color: #854d0e; }
         .badge.invalid { background-color: #fee2e2; color: #991b1b; }
         
-        .btn-action { padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; color: white; text-decoration: none; }
+        .btn-action { padding: 6px 10px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; color: white; text-decoration: none; margin-right: 2px; }
         .btn-valid { background-color: #16a34a; }
         .btn-invalid { background-color: #dc2626; }
+        .btn-delete { background-color: #64748b; }
         .alert { padding: 12px; background-color: #dcfce7; color: #166534; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
         
         /* Modal Form */
@@ -149,9 +150,14 @@
                                     <input type="hidden" name="status" value="invalid">
                                     <button type="submit" class="btn-action btn-invalid">Tolak</button>
                                 </form>
-                            @else
-                                <span style="color: #64748b; font-size: 12px;">Selesai</span>
                             @endif
+
+                            <!-- Tombol Hapus -->
+                            <form action="/pelanggan/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pelanggan ini?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-action btn-delete">Hapus</button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
