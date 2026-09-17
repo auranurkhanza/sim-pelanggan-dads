@@ -17,7 +17,6 @@
         .main-content { flex: 1; padding: 25px; overflow-y: auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { font-size: 22px; color: #0f172a; }
-        
         .btn-add { background-color: #0284c7; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
         
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -27,7 +26,6 @@
         
         .table-container { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; }
         .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
         th { background-color: #f8fafc; color: #475569; font-weight: 600; }
@@ -54,6 +52,8 @@
         .full-width { grid-column: span 2; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         .btn-cancel { background-color: #94a3b8; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
+        
+        .form-section { display: none; margin-top: 10px; padding-top: 15px; border-top: 1px dashed #cbd5e1; grid-column: span 2; }
     </style>
 </head>
 <body>
@@ -107,7 +107,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>CID / Nama</th>
+                        <th>CID / NIK / Nama</th>
                         <th>Pengisi & Stasiun</th>
                         <th>Teknisi & Sales</th>
                         <th>Status Validasi</th>
@@ -118,7 +118,8 @@
                     @foreach($pelanggan as $item)
                     <tr>
                         <td>
-                            <strong>{{ $item->cid ?? 'N/A' }}</strong><br>
+                            <!-- Menampilkan CID atau NIK tergantung yang mana yang terisi -->
+                            <strong>{{ $item->cid ?? $item->nik ?? 'N/A' }}</strong><br>
                             <small>{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
                         </td>
                         <td>
@@ -152,7 +153,6 @@
                                 </form>
                             @endif
 
-                            <!-- Tombol Hapus -->
                             <form action="/pelanggan/{{ $item->id }}" method="POST" style="display:inline;" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data pelanggan ini?');">
                                 @csrf
                                 @method('DELETE')
@@ -166,134 +166,182 @@
         </div>
     </div>
 
-    <!-- Modal Form Input 14 Field -->
+    <!-- Modal Form Input Dinamis -->
     <div class="modal" id="inputModal">
         <div class="modal-content">
             <h3>Input Data Pelanggan Baru</h3>
+            
             <form action="/pelanggan/store" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label>1. Pengisi</label>
-                        <select name="pengisi" required>
-                            <option value="">-- Pilih Pengisi --</option>
-                            <option value="IKR">IKR</option>
+                    
+                    <!-- Pilihan Pengisi -->
+                    <div class="form-group full-width">
+                        <label>1. Pilih Tipe Pengisi Data</label>
+                        <select name="pengisi" id="pengisiSelect" onchange="toggleFormByPengisi()" required>
+                            <option value="">-- Pilih Tipe Pengisi --</option>
+                            <option value="IKR">IKR (Teknisi)</option>
                             <option value="Sales">Sales</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>2. Tanggal Aktivasi</label>
-                        <input type="date" name="tanggal_aktivasi" required>
+                    <!-- ============================================== -->
+                    <!-- BAGIAN FORM KHUSUS IKR (14 Data) -->
+                    <!-- ============================================== -->
+                    <div id="formIKR" class="form-section">
+                        <h4 style="color:#0284c7; margin-bottom:15px; grid-column: span 2;">Form Input Khusus IKR (Teknisi)</h4>
+                        
+                        <div class="form-group">
+                            <label>2. Tanggal Aktivasi</label>
+                            <input type="date" name="tanggal_aktivasi" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>3. Stasiun</label>
+                            <select name="stasiun" class="ikr-input">
+                                <option value="">-- Pilih Stasiun --</option>
+                                <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option><option value="Semarang Poncol">Semarang Poncol</option><option value="Mojokerto">Mojokerto</option><option value="Surabaya Gubeng">Surabaya Gubeng</option><option value="Malang">Malang</option><option value="Talun">Talun</option><option value="Kediri">Kediri</option><option value="Tulungagung">Tulungagung</option><option value="Jombang">Jombang</option><option value="Probolinggo">Probolinggo</option><option value="Wanaraja">Wanaraja</option><option value="Pasirjengkol">Pasirjengkol</option><option value="Wlingi">Wlingi</option><option value="Kepanjen">Kepanjen</option><option value="Kalioso">Kalioso</option><option value="Salem">Salem</option><option value="Sukoharjo">Sukoharjo</option><option value="Kertosono">Kertosono</option><option value="Jerakah">Jerakah</option><option value="Nganjuk">Nganjuk</option><option value="Gedebage">Gedebage</option><option value="Tarik">Tarik</option><option value="Sumbergempol">Sumbergempol</option><option value="Cicalengka">Cicalengka</option><option value="Sidoarjo">Sidoarjo</option><option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option><option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option><option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option><option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option><option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option><option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>4. CID (Customer ID)</label>
+                            <input type="text" name="cid" placeholder="Masukkan CID" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>5. SN ONT</label>
+                            <input type="text" name="sn_ont" placeholder="Masukkan SN ONT" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>6. Nama Pelanggan</label>
+                            <input type="text" name="nama" placeholder="Nama Pelanggan" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>7. No HP</label>
+                            <input type="text" name="no_hp" placeholder="Contoh: 08123456789" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>8. Nama Teknisi (TIM)</label>
+                            <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>9. Sumber WO</label>
+                            <input type="text" name="sumber_wo" placeholder="Sumber WO" class="ikr-input">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>10. PIC Sales</label>
+                            <input type="text" name="pic_sales" placeholder="Nama PIC Sales" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>11. Foto KTP</label>
+                            <input type="file" name="foto_ktp" accept="image/*" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>12. Foto BAST Pelanggan</label>
+                            <input type="file" name="foto_bast" accept="image/*" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>13. Foto Pelanggan</label>
+                            <input type="file" name="foto_pelanggan" accept="image/*" class="ikr-input">
+                        </div>
+                        <div class="form-group">
+                            <label>14. Foto Bukti Transfer</label>
+                            <input type="file" name="foto_bukti_transfer" accept="image/*" class="ikr-input">
+                        </div>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label>3. Stasiun</label>
-                        <select name="stasiun" required>
-                            <option value="">-- Pilih Stasiun --</option>
-                            <option value="Tasikmalaya">Tasikmalaya</option>
-                            <option value="Randuagung">Randuagung</option>
-                            <option value="Garum">Garum</option>
-                            <option value="Semarang Poncol">Semarang Poncol</option>
-                            <option value="Mojokerto">Mojokerto</option>
-                            <option value="Surabaya Gubeng">Surabaya Gubeng</option>
-                            <option value="Malang">Malang</option>
-                            <option value="Talun">Talun</option>
-                            <option value="Kediri">Kediri</option>
-                            <option value="Tulungagung">Tulungagung</option>
-                            <option value="Jombang">Jombang</option>
-                            <option value="Probolinggo">Probolinggo</option>
-                            <option value="Wanaraja">Wanaraja</option>
-                            <option value="Pasirjengkol">Pasirjengkol</option>
-                            <option value="Wlingi">Wlingi</option>
-                            <option value="Kepanjen">Kepanjen</option>
-                            <option value="Kalioso">Kalioso</option>
-                            <option value="Salem">Salem</option>
-                            <option value="Sukoharjo">Sukoharjo</option>
-                            <option value="Kertosono">Kertosono</option>
-                            <option value="Jerakah">Jerakah</option>
-                            <option value="Nganjuk">Nganjuk</option>
-                            <option value="Gedebage">Gedebage</option>
-                            <option value="Tarik">Tarik</option>
-                            <option value="Sumbergempol">Sumbergempol</option>
-                            <option value="Cicalengka">Cicalengka</option>
-                            <option value="Sidoarjo">Sidoarjo</option>
-                            <option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option>
-                            <option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option>
-                            <option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option>
-                            <option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option>
-                            <option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option>
-                            <option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
-                        </select>
+                    <!-- ============================================== -->
+                    <!-- BAGIAN FORM KHUSUS SALES (9 Data) -->
+                    <!-- ============================================== -->
+                    <div id="formSales" class="form-section">
+                        <h4 style="color:#d97706; margin-bottom:15px; grid-column: span 2;">Form Input Khusus Sales</h4>
+                        
+                        <div class="form-group">
+                            <label>2. Tanggal Aktivasi</label>
+                            <input type="date" name="tanggal_aktivasi" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>3. Nama Sales</label>
+                            <input type="text" name="pic_sales" placeholder="Nama Sales" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>4. Stasiun</label>
+                            <select name="stasiun" class="sales-input">
+                                <option value="">-- Pilih Stasiun --</option>
+                                <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option><option value="Semarang Poncol">Semarang Poncol</option><option value="Mojokerto">Mojokerto</option><option value="Surabaya Gubeng">Surabaya Gubeng</option><option value="Malang">Malang</option><option value="Talun">Talun</option><option value="Kediri">Kediri</option><option value="Tulungagung">Tulungagung</option><option value="Jombang">Jombang</option><option value="Probolinggo">Probolinggo</option><option value="Wanaraja">Wanaraja</option><option value="Pasirjengkol">Pasirjengkol</option><option value="Wlingi">Wlingi</option><option value="Kepanjen">Kepanjen</option><option value="Kalioso">Kalioso</option><option value="Salem">Salem</option><option value="Sukoharjo">Sukoharjo</option><option value="Kertosono">Kertosono</option><option value="Jerakah">Jerakah</option><option value="Nganjuk">Nganjuk</option><option value="Gedebage">Gedebage</option><option value="Tarik">Tarik</option><option value="Sumbergempol">Sumbergempol</option><option value="Cicalengka">Cicalengka</option><option value="Sidoarjo">Sidoarjo</option><option value="Pakisaji - Malang Kota Lama">Pakisaji - Malang Kota Lama</option><option value="Sumberpucung - Ngebruk">Sumberpucung - Ngebruk</option><option value="Ngebruk - Kepanjen">Ngebruk - Kepanjen</option><option value="Kepanjen - Pakisaji">Kepanjen - Pakisaji</option><option value="Malang Kota Lama - Malang Kota Baru">Malang Kota Lama - Malang Kota Baru</option><option value="Wlingi - Kesamben">Wlingi - Kesamben</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>5. Nama Pelanggan</label>
+                            <input type="text" name="nama" placeholder="Nama Pelanggan" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>6. NIK Pelanggan</label>
+                            <input type="text" name="nik" placeholder="Masukkan NIK 16 Digit" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>7. No HP</label>
+                            <input type="text" name="no_hp" placeholder="Contoh: 08123456789" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>8. Foto KTP</label>
+                            <input type="file" name="foto_ktp" accept="image/*" class="sales-input">
+                        </div>
+                        <div class="form-group">
+                            <label>9. Foto Bukti Transfer</label>
+                            <input type="file" name="foto_bukti_transfer" accept="image/*" class="sales-input">
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>4. CID (Customer ID)</label>
-                        <input type="text" name="cid" placeholder="Masukkan CID" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>5. SN ONT</label>
-                        <input type="text" name="sn_ont" placeholder="Masukkan SN ONT" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>6. Nama Pelanggan</label>
-                        <input type="text" name="nama" placeholder="Nama Pelanggan" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>7. No HP</label>
-                        <input type="text" name="no_hp" placeholder="Contoh: 08123456789" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>8. Nama Teknisi (TIM)</label>
-                        <input type="text" name="nama_teknisi" placeholder="Nama Teknisi/Tim" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>9. Sumber WO</label>
-                        <input type="text" name="sumber_wo" placeholder="Sumber WO" required>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>10. PIC Sales</label>
-                        <input type="text" name="pic_sales" placeholder="Nama PIC Sales" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>11. Foto KTP</label>
-                        <input type="file" name="foto_ktp" accept="image/*">
-                    </div>
-
-                    <div class="form-group">
-                        <label>12. Foto BAST Pelanggan</label>
-                        <input type="file" name="foto_bast" accept="image/*">
-                    </div>
-
-                    <div class="form-group">
-                        <label>13. Foto Pelanggan</label>
-                        <input type="file" name="foto_pelanggan" accept="image/*">
-                    </div>
-
-                    <div class="form-group">
-                        <label>14. Foto Bukti Transfer</label>
-                        <input type="file" name="foto_bukti_transfer" accept="image/*">
-                    </div>
                 </div>
 
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-                    <button type="submit" class="btn-add">Simpan Data Pelanggan</button>
+                    <!-- Tombol simpan default dinonaktifkan sampai tipe pengisi dipilih -->
+                    <button type="submit" class="btn-add" id="btnSubmit" style="display:none;">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        function openModal() { document.getElementById('inputModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+        function openModal() { 
+            document.getElementById('inputModal').style.display = 'flex'; 
+            toggleFormByPengisi(); // reset saat dibuka
+        }
+        function closeModal() { 
+            document.getElementById('inputModal').style.display = 'none'; 
+        }
+
+        function toggleFormByPengisi() {
+            var selected = document.getElementById('pengisiSelect').value;
+            var formIKR = document.getElementById('formIKR');
+            var formSales = document.getElementById('formSales');
+            var btnSubmit = document.getElementById('btnSubmit');
+            
+            // Ambil semua input spesifik
+            var inputsIKR = formIKR.querySelectorAll('.ikr-input');
+            var inputsSales = formSales.querySelectorAll('.sales-input');
+
+            // Matikan dan Sembunyikan semuanya terlebih dahulu
+            formIKR.style.display = 'none';
+            formSales.style.display = 'none';
+            btnSubmit.style.display = 'none';
+            inputsIKR.forEach(el => el.disabled = true);
+            inputsSales.forEach(el => el.disabled = true);
+
+            // Aktifkan Form berdasarkan pilihan
+            if (selected === 'IKR') {
+                formIKR.style.display = 'grid';
+                btnSubmit.style.display = 'block';
+                // Enable inputs IKR dan set wajib diisi (required)
+                inputsIKR.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
+            } 
+            else if (selected === 'Sales') {
+                formSales.style.display = 'grid';
+                btnSubmit.style.display = 'block';
+                // Enable inputs Sales dan set wajib diisi (required)
+                inputsSales.forEach(el => { el.disabled = false; el.required = (el.type !== 'file'); });
+            }
+        }
     </script>
 
 </body>
