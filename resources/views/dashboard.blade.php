@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validasi Data Pelanggan - SIM Pelanggan DADS</title>
+    <title>Validasi Data - SIVALID STARLITE DADS</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { display: flex; height: 100vh; background-color: #f4f6f9; color: #333; }
         
         .sidebar { width: 250px; background-color: #1e293b; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar h2 { font-size: 18px; font-weight: bold; margin-bottom: 25px; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 12px; }
+        .sidebar h2 { font-size: 16px; font-weight: bold; margin-bottom: 25px; color: #38bdf8; border-bottom: 1px solid #334155; padding-bottom: 12px; letter-spacing: 0.5px; }
         .menu a { display: block; color: #cbd5e1; text-decoration: none; padding: 10px 14px; border-radius: 6px; margin-bottom: 6px; font-size: 14px; }
         .menu a:hover, .menu a.active { background-color: #0284c7; color: white; }
         .logout-btn { background-color: #ef4444; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; }
@@ -63,7 +63,7 @@
 
     <div class="sidebar">
         <div>
-            <h2>SIM PELANGGAN DADS</h2>
+            <h2>SIVALID STARLITE DADS</h2>
             <div class="menu">
                 <a href="/dashboard" class="active">Validasi Data (IKR)</a>
                 <a href="/pelanggan">Semua Pelanggan</a>
@@ -93,15 +93,15 @@
                 <div class="number">{{ $pelanggan->where('pengisi', 'IKR')->count() }}</div>
             </div>
             <div class="card">
-                <h3>Belum Divalidasi</h3>
+                <h3>Pending</h3>
                 <div class="number" style="color: #d97706;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'pending')->count() }}</div>
             </div>
             <div class="card">
-                <h3>IKR Valid</h3>
+                <h3>Valid</h3>
                 <div class="number" style="color: #16a34a;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'valid')->count() }}</div>
             </div>
             <div class="card">
-                <h3>IKR Tidak Valid</h3>
+                <h3>Tidak Valid</h3>
                 <div class="number" style="color: #dc2626;">{{ $pelanggan->where('pengisi', 'IKR')->where('status_validasi', 'invalid')->count() }}</div>
             </div>
         </div>
