@@ -4,39 +4,107 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
-// Route simpan dengan logika Auto-Validation Nama
+Route::get('/', function () {
+    return redirect('/login');
+});
+
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
+
+Route::post('/login', function (Request $request) {
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/dashboard');
+    }
+
+    return back()->withErrors(['email' => 'Email atau password salah.']);
+});
+
+Route::get('/dashboard', function () {
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+    return view('dashboard', compact('pelanggan'));
+})->middleware('auth');
+
+Route::get('/pelanggan', function () {
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+    return view('pelanggan', compact('pelanggan'));
+})->middleware('auth');
+
+Route::get('/laporan', function () {
+    $pelanggan = DB::table('pelanggan')->orderBy('id', 'desc')->get();
+    return view('laporan', compact('pelanggan'));
+})->middleware('auth');
+
+// FUNGSI BANTUAN OCR UNTUK MEMBACA TEKS DARI FOTO
+function ocrReadImage($file) {
+    try {
+        $response = Http::attach(
+            'file', file_get_contents($file->path()), $file->getClientOriginalName()
+        )->post('https://api.ocr.space/parse/image', [
+            'apikey' => 'K86792934788957', // API Key OCR.space
+            'language' => 'eng',
+            'isOverlayRequired' => 'false'
+        ]);
+
+        $result = $response->json();
+        if (isset($result['ParsedResults'][0]['ParsedText'])) {
+            return strtoupper($result['ParsedResults'][0]['ParsedText']);
+        }
+    } catch (\Exception $e) {
+        return '';
+    }
+    return '';
+}
+
+// ROUTE SIMPAN DENGAN AUTO-VALIDASI OCR (KTP & BAST)
 Route::post('/pelanggan/store', function (Request $request) {
     $pengisi = $request->input('pengisi');
-    $namaInput = strtolower(trim($request->input('nama')));
+    $namaInput = strtoupper(trim($request->input('nama')));
     
-    // Default Status Validasi
     $statusValidasi = 'pending';
+    $catatanValidasi = '';
 
-    // -------------------------------------------------------------
-    // LOGIKA AUTO-VALIDATION NAMA (Jika Pengisi IKR)
-    // -------------------------------------------------------------
+    // Lakukan OCR hanya jika tipe pengisi = IKR
     if ($pengisi === 'IKR') {
-        $namaKtpSesuai = true;
-        $namaBastSesuai = true;
+        $ktpMatched = false;
+        $bastMatched = false;
 
-        // 1. Cek apakah ada file Foto KTP & BAST
-        // (Di tingkat lanjut, teks $namaInput dicocokkan dengan hasil scan OCR foto)
-        if ($request->hasFile('foto_ktp') && $request->hasFile('foto_bast')) {
-            // Contoh aturan auto-validation:
-            // Jika Nama Pelanggan diisi dengan benar (tidak kosong & min 3 karakter)
-            if (strlen($namaInput) >= 3) {
-                $statusValidasi = 'valid'; // AUTO-VALIDATED!
-            } else {
-                $statusValidasi = 'invalid';
+        // 1. Scan Foto KTP
+        if ($request->hasFile('foto_ktp')) {
+            $teksKtp = ocrReadImage($request->file('foto_ktp'));
+            if (str_contains($teksKtp, $namaInput)) {
+                $ktpMatched = true;
             }
-        } else {
-            // Jika berkas foto tidak lengkap
+        }
+
+        // 2. Scan Foto BAST
+        if ($request->hasFile('foto_bast')) {
+            $teksBast = ocrReadImage($request->file('foto_bast'));
+            if (str_contains($teksBast, $namaInput)) {
+                $bastMatched = true;
+            }
+        }
+
+        // 3. Evaluasi Hasil Pencocokan Nama
+        if ($ktpMatched && $bastMatched) {
+            $statusValidasi = 'valid'; // Keduanya Cocok Otomatis Valid!
+            $catatanValidasi = 'Sistem Auto-Validasi: Nama sesuai pada KTP dan BAST.';
+        } elseif ($ktpMatched || $bastMatched) {
             $statusValidasi = 'pending';
+            $catatanValidasi = 'Sistem Auto-Validasi: Nama hanya ditemukan di salah satu berkas.';
+        } else {
+            $statusValidasi = 'invalid';
+            $catatanValidasi = 'Sistem Auto-Validasi: Nama tidak ditemukan pada Foto KTP & BAST.';
         }
     } else {
         // Sales otomatis Valid
         $statusValidasi = 'valid';
+        $catatanValidasi = 'Input Sales Direct';
     }
 
     $data = [
@@ -56,7 +124,6 @@ Route::post('/pelanggan/store', function (Request $request) {
         'updated_at'         => now(),
     ];
 
-    // Simpan File Upload Foto
     $fotoFields = ['foto_ktp', 'foto_bast', 'foto_pelanggan', 'foto_bukti_transfer'];
     foreach ($fotoFields as $field) {
         if ($request->hasFile($field)) {
@@ -67,9 +134,19 @@ Route::post('/pelanggan/store', function (Request $request) {
 
     DB::table('pelanggan')->insert($data);
 
-    $pesan = ($statusValidasi === 'valid') 
-        ? 'Data Berhasil Diinput & Ter-VALIDASI Otomatis oleh Sistem!' 
-        : 'Data Berhasil Diinput (Menunggu Verifikasi Manual Admin).';
+    return back()->with('success', 'Data Pelanggan Berhasil Diproses! ' . $catatanValidasi);
+})->middleware('auth');
 
-    return back()->with('success', $pesan);
+Route::post('/validasi/{id}', function (Request $request, $id) {
+    $status = $request->input('status');
+    DB::table('pelanggan')->where('id', $id)->update([
+        'status_validasi' => $status,
+        'updated_at' => now()
+    ]);
+    return back()->with('success', 'Status validasi berhasil diperbarui!');
+})->middleware('auth');
+
+Route::delete('/pelanggan/{id}', function ($id) {
+    DB::table('pelanggan')->where('id', $id)->delete();
+    return back()->with('success', 'Data pelanggan berhasil dihapus!');
 })->middleware('auth');
