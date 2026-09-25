@@ -3,80 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validasi Data - SIVALID STARLITE DADS</title>
+    <title>SIVALID — Customer Management System</title>
+    <!-- Import Font Premium Modern -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #0f172a; color: #f8fafc; overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #090d16; color: #f1f5f9; overflow-x: hidden; }
         
         /* Navbar Mobile Header */
-        .mobile-header { display: none; width: 100%; background: #0b132b; padding: 14px 20px; border-bottom: 1px solid #1e293b; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 101; }
-        .mobile-header h2 { font-size: 15px; font-weight: 800; color: #38bdf8; }
-        .menu-toggle { background: #0284c7; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .mobile-header { display: none; width: 100%; background: #0f172a; padding: 14px 20px; border-bottom: 1px solid #1e293b; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 101; }
+        .mobile-header h2 { font-size: 15px; font-weight: 800; color: #38bdf8; letter-spacing: -0.3px; }
+        .menu-toggle { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
 
-        /* Sidebar Overlay Desktop & Mobile */
-        .sidebar { width: 260px; background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%); color: white; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; transition: transform 0.3s ease; z-index: 102; }
-        .sidebar h2 { font-size: 16px; font-weight: 800; margin-bottom: 25px; color: #38bdf8; border-bottom: 2px solid #0284c7; padding-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
-        .menu a { display: block; color: #94a3b8; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s; }
-        .menu a:hover, .menu a.active { background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%); color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); }
-        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; font-weight: 600; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; }
+        /* Sidebar Navigation */
+        .sidebar { width: 260px; background: #0f172a; color: white; padding: 24px 20px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; transition: transform 0.3s ease; z-index: 102; }
+        .brand-box { padding-bottom: 20px; border-bottom: 1px solid #1e293b; margin-bottom: 24px; }
+        .brand-title { font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; }
+        .brand-sub { font-size: 10px; font-weight: 700; color: #38bdf8; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+        
+        .menu a { display: flex; align-items: center; gap: 10px; color: #94a3b8; text-decoration: none; padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; font-size: 13.5px; font-weight: 600; transition: all 0.2s; }
+        .menu a:hover { background: rgba(255, 255, 255, 0.04); color: #f8fafc; }
+        .menu a.active { background: #0284c7; color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        
+        .logout-btn { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); padding: 11px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .logout-btn:hover { background: #ef4444; color: white; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; }
 
-        /* Main Content Container */
-        .main-content { flex: 1; padding: 28px; overflow-y: auto; background-color: #0f172a; width: 100%; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-        .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; letter-spacing: -0.5px; }
+        /* Main Content */
+        .main-content { flex: 1; padding: 32px 36px; overflow-y: auto; background-color: #090d16; width: 100%; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; flex-wrap: wrap; gap: 14px; }
+        .header-title h1 { font-size: 22px; color: #f8fafc; font-weight: 700; letter-spacing: -0.4px; }
+        .header-title p { font-size: 13px; color: #64748b; margin-top: 2px; }
+        
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-add { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3); }
-        .btn-export { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: white; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; text-decoration: none; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
+        .btn-add { background: #0284c7; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25); transition: all 0.2s; }
+        .btn-add:hover { background: #0369a1; transform: translateY(-1px); }
+        .btn-export { background: #10b981; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25); transition: all 0.2s; }
+        .btn-export:hover { background: #059669; transform: translateY(-1px); }
         
-        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
-        .card { background-color: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; }
-        .card h3 { font-size: 12px; color: #94a3b8; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
-        .card .number { font-size: 24px; font-weight: 800; color: #f8fafc; }
+        /* Stats Cards Minimalis */
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { background: #0f172a; padding: 18px 20px; border-radius: 12px; border: 1px solid #1e293b; transition: border-color 0.2s; }
+        .card:hover { border-color: #334155; }
+        .card h3 { font-size: 11.5px; color: #64748b; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; }
+        .card .number { font-size: 26px; font-weight: 800; color: #f8fafc; letter-spacing: -0.5px; }
 
-        .filter-bar { background-color: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
-        .filter-input, .filter-select { flex: 1; min-width: 140px; padding: 9px 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
-        .filter-actions { display: flex; gap: 10px; width: 100%; justify-content: flex-end; margin-top: 4px; }
-        .btn-filter { padding: 9px 16px; background-color: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; flex: 1; text-align: center; }
-        .btn-reset { padding: 9px 16px; background-color: #475569; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; flex: 1; text-align: center; }
+        /* Modern Filter Bar */
+        .filter-bar { background: #0f172a; padding: 14px 18px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; flex: 1; }
+        .filter-input, .filter-select { padding: 8.5px 12px; background-color: #090d16; border: 1px solid #1e293b; border-radius: 8px; font-size: 13px; color: #f1f5f9; outline: none; transition: all 0.2s; }
+        .filter-input { flex: 1.5; min-width: 180px; }
+        .filter-select { flex: 1; min-width: 130px; }
+        .filter-input:focus, .filter-select:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+        .filter-actions { display: flex; gap: 8px; }
+        .btn-filter { padding: 8.5px 16px; background-color: #1e293b; color: #f1f5f9; border: 1px solid #334155; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .btn-filter:hover { background-color: #334155; }
+        .btn-reset { padding: 8.5px 16px; background-color: transparent; color: #64748b; border: 1px solid transparent; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; transition: all 0.2s; }
+        .btn-reset:hover { color: #f1f5f9; }
         
-        .table-container { background-color: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; overflow-x: auto; }
-        .table-header h3 { font-size: 16px; color: #38bdf8; font-weight: 700; margin-bottom: 14px; }
+        /* Clean Table Style */
+        .table-container { background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #1e293b; overflow-x: auto; }
+        .table-header h3 { font-size: 15px; color: #f8fafc; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.2px; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
-        th { background-color: #0f172a; color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 11px; }
-        td { color: #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 650px; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #1e293b; }
+        th { background-color: #090d16; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        td { color: #cbd5e1; }
+        tr:last-child td { border-bottom: none; }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-        .badge.valid { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge.pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge.invalid { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .badge.sales { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; display: inline-block; letter-spacing: 0.2px; }
+        .badge.valid { background-color: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge.pending { background-color: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .badge.invalid { background-color: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge.sales { background-color: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
         
-        .btn-action { padding: 6px 10px; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: white; text-decoration: none; margin-right: 2px; }
-        .btn-valid { background-color: #10b981; }
-        .btn-invalid { background-color: #ef4444; }
-        .btn-delete { background-color: #64748b; }
+        .btn-action { padding: 5px 10px; border: none; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; color: white; text-decoration: none; margin-right: 3px; transition: opacity 0.2s; }
+        .btn-action:hover { opacity: 0.85; }
+        .btn-valid { background-color: #059669; }
+        .btn-invalid { background-color: #dc2626; }
+        .btn-delete { background-color: #475569; }
         
-        .alert-success { padding: 12px; background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; border-radius: 8px; margin-bottom: 18px; font-size: 13px; }
-        .alert-danger { padding: 12px; background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; margin-bottom: 18px; font-size: 13px; }
+        .alert-success { padding: 12px 16px; background-color: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 500; }
+        .alert-danger { padding: 12px 16px; background-color: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; margin-bottom: 20px; font-size: 13px; font-weight: 500; }
         
-        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; padding: 14px; }
-        .modal-content { background-color: #1e293b; padding: 22px; border-radius: 12px; border: 1px solid #334155; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; color: #f8fafc; }
-        .modal-content h3 { margin-bottom: 16px; color: #38bdf8; font-size: 17px; }
-        .form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        /* Modal Form Minimalis */
+        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); justify-content: center; align-items: center; padding: 16px; }
+        .modal-content { background-color: #0f172a; padding: 24px; border-radius: 16px; border: 1px solid #1e293b; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; color: #f8fafc; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .modal-content h3 { margin-bottom: 18px; color: #f8fafc; font-size: 17px; font-weight: 700; }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
         @media (min-width: 600px) { .form-grid { grid-template-columns: 1fr 1fr; } }
         .form-group { display: flex; flex-direction: column; }
-        .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #cbd5e1; }
-        .form-group input, .form-group select { padding: 9px 11px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; }
+        .form-group label { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #94a3b8; }
+        .form-group input, .form-group select { padding: 9.5px 12px; background-color: #090d16; border: 1px solid #1e293b; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: #0284c7; }
         .full-width { grid-column: 1 / -1; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
-        .btn-cancel { background-color: #475569; color: white; border: none; padding: 9px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .form-section { display: none; margin-top: 10px; padding-top: 12px; border-top: 1px dashed #334155; grid-column: 1 / -1; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-cancel:hover { color: #f1f5f9; }
+        .form-section { display: none; margin-top: 8px; padding-top: 14px; border-top: 1px dashed #1e293b; grid-column: 1 / -1; }
 
-        /* Media Queries untuk HP/Mobile */
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .mobile-header { display: flex; }
@@ -84,28 +111,29 @@
             .sidebar.active { transform: translateX(0); }
             .overlay.active { display: block; }
             .main-content { padding: 75px 16px 24px 16px; }
-            .header h1 { font-size: 20px; }
+            .header-title h1 { font-size: 19px; }
             .btn-group { width: 100%; }
-            .btn-add, .btn-export { flex: 1; text-align: center; font-size: 13px; padding: 10px; }
+            .btn-add, .btn-export { flex: 1; justify-content: center; font-size: 12.5px; padding: 10px; }
             .filter-input, .filter-select { min-width: 100%; }
+            .filter-actions { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header khusus Layar HP -->
     <div class="mobile-header">
-        <h2>STARLITE DADS</h2>
+        <h2>SIVALID STARLITE</h2>
         <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
     </div>
 
-    <!-- Overlay Latar Belakang saat Menu HP Terbuka -->
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-    <!-- Sidebar Navigation -->
     <div class="sidebar" id="sidebar">
         <div>
-            <h2>SIVALID STARLITE DADS</h2>
+            <div class="brand-box">
+                <div class="brand-title">SIVALID SYSTEM</div>
+                <div class="brand-sub">STARLITE x PT DADS</div>
+            </div>
             <div class="menu">
                 <a href="/dashboard" class="active">Validasi Data</a>
                 <a href="/pelanggan">Semua Pelanggan</a>
@@ -117,7 +145,10 @@
 
     <div class="main-content">
         <div class="header">
-            <h1>Validasi Data Pelanggan</h1>
+            <div class="header-title">
+                <h1>Validasi Data Pelanggan</h1>
+                <p>Kelola dan verifikasi data pengajuan IKR & Sales</p>
+            </div>
             <div class="btn-group">
                 <a href="/pelanggan/export" class="btn-export">📊 Export Excel</a>
                 <button class="btn-add" onclick="openModal()">+ Input Baru</button>
@@ -151,20 +182,19 @@
             </div>
         </div>
 
-        <!-- BAR FILTER PENUH DI HP -->
         <form action="/dashboard" method="GET" class="filter-bar">
             <div class="filter-group">
-                <input type="text" name="search" class="filter-input" placeholder="Cari Nama / CID / NIK..." value="{{ request('search') }}">
+                <input type="text" name="search" class="filter-input" placeholder="Cari Nama, CID, NIK..." value="{{ request('search') }}">
                 
                 <select name="status" class="filter-select">
-                    <option value="">-- Semua Status --</option>
+                    <option value="">Semua Status</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="valid" {{ request('status') == 'valid' ? 'selected' : '' }}>Valid</option>
                     <option value="invalid" {{ request('status') == 'invalid' ? 'selected' : '' }}>Tidak Valid</option>
                 </select>
 
                 <select name="stasiun" class="filter-select">
-                    <option value="">-- Semua Stasiun --</option>
+                    <option value="">Semua Stasiun</option>
                     <option value="Tasikmalaya" {{ request('stasiun') == 'Tasikmalaya' ? 'selected' : '' }}>Tasikmalaya</option>
                     <option value="Randuagung" {{ request('stasiun') == 'Randuagung' ? 'selected' : '' }}>Randuagung</option>
                     <option value="Garum" {{ request('stasiun') == 'Garum' ? 'selected' : '' }}>Garum</option>
@@ -181,14 +211,14 @@
             </div>
 
             <div class="filter-actions">
-                <button type="submit" class="btn-filter">Terapkan Filter</button>
+                <button type="submit" class="btn-filter">Filter</button>
                 <a href="/dashboard" class="btn-reset">Reset</a>
             </div>
         </form>
 
         <div class="table-container">
             <div class="table-header">
-                <h3>Daftar Antrean Validasi</h3>
+                <h3>Antrean Validasi (Starlite FTTH)</h3>
             </div>
             
             <table>
@@ -206,11 +236,11 @@
                     <tr>
                         <td>
                             <strong>{{ $item->cid ?? $item->nik ?? 'N/A' }}</strong><br>
-                            <small style="color: #94a3b8;">{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
+                            <small style="color: #64748b;">{{ $item->nama }} ({{ $item->no_hp ?? '-' }})</small>
                         </td>
                         <td>
-                            <span class="badge" style="background-color: #334155; color: #f8fafc;">{{ strtoupper($item->pengisi ?? '-') }}</span><br>
-                            <small style="color: #94a3b8;">{{ $item->stasiun ?? '-' }}</small>
+                            <span class="badge" style="background: #1e293b; color: #f8fafc;">{{ strtoupper($item->pengisi ?? '-') }}</span><br>
+                            <small style="color: #64748b;">{{ $item->stasiun ?? '-' }}</small>
                         </td>
                         <td>
                             @if($item->pengisi == 'IKR')
@@ -226,7 +256,7 @@
                             @endif
                         </td>
                         <td>
-                            <small style="color: #94a3b8; font-style: italic;">{{ $item->remark ?? '-' }}</small>
+                            <small style="color: #64748b; font-style: italic;">{{ $item->remark ?? '-' }}</small>
                         </td>
                         <td>
                             @if($item->pengisi == 'IKR' && $item->status_validasi == 'pending')
@@ -251,7 +281,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; color: #94a3b8; padding: 24px;">
+                        <td colspan="5" style="text-align: center; color: #64748b; padding: 24px;">
                             Belum ada data pelanggan.
                         </td>
                     </tr>
@@ -273,7 +303,7 @@
                 <div class="form-grid">
                     
                     <div class="form-group full-width">
-                        <label>1. Pilih Tipe Pengisi Data</label>
+                        <label>1. Tipe Pengisi Data</label>
                         <select name="pengisi" id="pengisiSelect" onchange="toggleFormByPengisi()" required>
                             <option value="">-- Pilih Tipe Pengisi --</option>
                             <option value="IKR" {{ old('pengisi') == 'IKR' ? 'selected' : '' }}>IKR (Teknisi - Perlu Validasi)</option>
@@ -283,7 +313,7 @@
 
                     <!-- FORM IKR -->
                     <div id="formIKR" class="form-section">
-                        <h4 style="color:#38bdf8; margin-bottom:12px;" class="full-width">Form Input Khusus Teknisi</h4>
+                        <h4 style="color:#0284c7; margin-bottom:12px; font-size: 13.5px;" class="full-width">Form Input Khusus Teknisi</h4>
                         
                         <div class="form-group"><label>2. Tanggal Aktivasi</label><input type="date" name="tanggal_aktivasi" class="ikr-input" value="{{ old('tanggal_aktivasi') }}"></div>
                         <div class="form-group"><label>3. Stasiun</label>
@@ -292,10 +322,10 @@
                                 <option value="Tasikmalaya">Tasikmalaya</option><option value="Randuagung">Randuagung</option><option value="Garum">Garum</option><option value="Malang">Malang</option>
                             </select>
                         </div>
-                        <div class="form-group"><label>4. CID (Customer ID)</label><input type="text" name="cid" placeholder="CID" class="ikr-input" value="{{ old('cid') }}"></div>
-                        <div class="form-group"><label>5. SN ONT</label><input type="text" name="sn_ont" placeholder="SN ONT" class="ikr-input" value="{{ old('sn_ont') }}"></div>
+                        <div class="form-group"><label>4. CID (Customer ID)</label><input type="text" name="cid" placeholder="Masukkan CID" class="ikr-input" value="{{ old('cid') }}"></div>
+                        <div class="form-group"><label>5. SN ONT</label><input type="text" name="sn_ont" placeholder="Masukkan SN ONT" class="ikr-input" value="{{ old('sn_ont') }}"></div>
                         <div class="form-group"><label>6. Nama Pelanggan</label><input type="text" name="nama" placeholder="Nama Pelanggan" class="ikr-input" value="{{ old('nama') }}"></div>
-                        <div class="form-group"><label>7. No HP</label><input type="text" name="no_hp" placeholder="No HP" class="ikr-input" value="{{ old('no_hp') }}"></div>
+                        <div class="form-group"><label>7. No HP</label><input type="text" name="no_hp" placeholder="Contoh: 08123456789" class="ikr-input" value="{{ old('no_hp') }}"></div>
                         <div class="form-group"><label>8. Nama Teknisi</label><input type="text" name="nama_teknisi" placeholder="Teknisi/Tim" class="ikr-input" value="{{ old('nama_teknisi') }}"></div>
                         <div class="form-group"><label>9. Sumber WO</label>
                             <select name="sumber_wo" class="ikr-input">
@@ -312,7 +342,7 @@
 
                     <!-- FORM SALES -->
                     <div id="formSales" class="form-section">
-                        <h4 style="color:#fbbf24; margin-bottom:12px;" class="full-width">Form Input Khusus Sales</h4>
+                        <h4 style="color:#f59e0b; margin-bottom:12px; font-size: 13.5px;" class="full-width">Form Input Khusus Sales</h4>
                         <div class="form-group"><label>2. Tanggal Aktivasi</label><input type="date" name="tanggal_aktivasi" class="sales-input"></div>
                         <div class="form-group"><label>3. Nama Sales</label><input type="text" name="pic_sales" placeholder="Nama Sales" class="sales-input"></div>
                         <div class="form-group"><label>4. Stasiun</label>
