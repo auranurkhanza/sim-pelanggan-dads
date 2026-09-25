@@ -6,40 +6,63 @@
     <title>Semua Pelanggan - SIVALID STARLITE DADS</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; height: 100vh; background-color: #0f172a; color: #f8fafc; }
+        body { display: flex; height: 100vh; background-color: #0f172a; color: #f8fafc; overflow-x: hidden; }
         
-        .sidebar { width: 260px; background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%); color: white; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; }
-        .sidebar h2 { font-size: 16px; font-weight: 800; margin-bottom: 25px; color: #38bdf8; border-bottom: 2px solid #0284c7; padding-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
-        .menu a { display: block; color: #94a3b8; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; transition: all 0.3s; }
-        .menu a:hover, .menu a.active { background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%); color: white; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4); }
-        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; font-weight: 600; }
-        
-        .main-content { flex: 1; padding: 28px; overflow-y: auto; background-color: #0f172a; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; }
+        .mobile-header { display: none; width: 100%; background: #0b132b; padding: 14px 20px; border-bottom: 1px solid #1e293b; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 101; }
+        .mobile-header h2 { font-size: 15px; font-weight: 800; color: #38bdf8; }
+        .menu-toggle { background: #0284c7; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
 
-        .filter-bar { background-color: #1e293b; padding: 16px 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
-        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-        .filter-input, .filter-select { padding: 9px 14px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
-        .filter-input:focus, .filter-select:focus { border-color: #38bdf8; box-shadow: 0 0 6px rgba(56, 189, 248, 0.3); }
-        .btn-filter { padding: 9px 16px; background-color: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
-        .btn-reset { padding: 9px 16px; background-color: #475569; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; }
+        .sidebar { width: 260px; background: linear-gradient(180deg, #0b132b 0%, #1c2541 100%); color: white; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #1e293b; transition: transform 0.3s ease; z-index: 102; }
+        .sidebar h2 { font-size: 16px; font-weight: 800; margin-bottom: 25px; color: #38bdf8; border-bottom: 2px solid #0284c7; padding-bottom: 12px; }
+        .menu a { display: block; color: #94a3b8; text-decoration: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+        .menu a:hover, .menu a.active { background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%); color: white; }
+        .logout-btn { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; text-align: center; text-decoration: none; display: block; font-size: 14px; font-weight: 600; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; }
+
+        .main-content { flex: 1; padding: 28px; overflow-y: auto; background-color: #0f172a; width: 100%; }
+        .header h1 { font-size: 24px; color: #f8fafc; font-weight: 700; margin-bottom: 20px; }
+
+        .filter-bar { background-color: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+        .filter-group { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
+        .filter-input, .filter-select { flex: 1; min-width: 140px; padding: 9px 12px; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; font-size: 13px; color: #f8fafc; outline: none; }
+        .filter-actions { display: flex; gap: 10px; width: 100%; justify-content: flex-end; margin-top: 4px; }
+        .btn-filter { padding: 9px 16px; background-color: #0284c7; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; flex: 1; text-align: center; }
+        .btn-reset { padding: 9px 16px; background-color: #475569; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none; flex: 1; text-align: center; }
         
-        .table-container { background-color: #1e293b; padding: 22px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #334155; }
-        th { background-color: #0f172a; color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 12px; }
+        .table-container { background-color: #1e293b; padding: 18px; border-radius: 12px; border: 1px solid #334155; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background-color: #0f172a; color: #cbd5e1; font-weight: 700; text-transform: uppercase; font-size: 11px; }
         td { color: #e2e8f0; }
         
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
-        .badge.valid { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge.pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge.invalid { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .badge.sales { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge.valid { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .badge.pending { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge.invalid { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .badge.sales { background-color: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .overlay.active { display: block; }
+            .main-content { padding: 75px 16px 24px 16px; }
+            .header h1 { font-size: 20px; }
+            .filter-input, .filter-select { min-width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+
+    <div class="mobile-header">
+        <h2>STARLITE DADS</h2>
+        <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
         <div>
             <h2>SIVALID STARLITE DADS</h2>
             <div class="menu">
@@ -84,7 +107,7 @@
                 </select>
             </div>
 
-            <div>
+            <div class="filter-actions">
                 <button type="submit" class="btn-filter">Terapkan Filter</button>
                 <a href="/pelanggan" class="btn-reset">Reset</a>
             </div>
@@ -127,7 +150,7 @@
                     @empty
                     <tr>
                         <td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">
-                            Belum ada data pelanggan yang sesuai dengan filter pencarian.
+                            Belum ada data pelanggan.
                         </td>
                     </tr>
                     @endforelse
@@ -135,5 +158,12 @@
             </table>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+    </script>
 </body>
 </html>
